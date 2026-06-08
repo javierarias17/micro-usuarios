@@ -3,7 +3,6 @@ package com.pragma.powerup.infrastructure.out.jpa.adapter;
 import com.pragma.powerup.domain.model.RolModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
-import com.pragma.powerup.infrastructure.exception.RolNotFoundException;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRoleEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IRolRepository;
@@ -41,7 +40,6 @@ public class UserJpaAdapter implements IUserPersistencePort {
     @Override
     public RolModel getRoleById(Long id) {
         return rolRepository.findById(id)
-                .map(roleEntityMapper::toRolModel)
-                .orElseThrow(RolNotFoundException::new);
+                .map(roleEntityMapper::toRolModel).orElse(null);
     }
 }

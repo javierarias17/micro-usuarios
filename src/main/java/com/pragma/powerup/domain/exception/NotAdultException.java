@@ -1,7 +1,10 @@
 package com.pragma.powerup.domain.exception;
 
-public class NotAdultException extends RuntimeException {
-    public NotAdultException() {
-        super();
+import java.util.Map;
+
+public class NotAdultException extends FunctionalException {
+
+    public NotAdultException(String message, Map<String,String> error) {
+        super(message, error);
     }
 }
