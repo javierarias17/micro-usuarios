@@ -51,5 +51,5 @@ public class UserEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
-    private RolEntity role;
+    private RoleEntity role;
 }

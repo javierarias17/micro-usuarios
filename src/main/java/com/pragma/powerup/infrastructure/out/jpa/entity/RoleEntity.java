@@ -18,7 +18,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Getter
 @Setter
-public class RolEntity {
+public class RoleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

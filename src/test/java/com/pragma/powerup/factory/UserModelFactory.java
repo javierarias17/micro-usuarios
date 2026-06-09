@@ -1,6 +1,6 @@
 package com.pragma.powerup.factory;
 
-import com.pragma.powerup.domain.model.RolModel;
+import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 
 import java.time.LocalDate;
@@ -11,8 +11,8 @@ public class UserModelFactory {
         throw new IllegalStateException("Utility class");
     }
 
-    public static RolModel createOwnerRole() {
-        return RolModel.builder()
+    public static RoleModel createOwnerRole() {
+        return RoleModel.builder()
                 .id(2L)
                 .name("OWNER")
                 .description("Restaurant owner")
@@ -43,7 +43,7 @@ public class UserModelFactory {
                 .build();
     }
 
-    public static UserModel createSavedUser(RolModel role) {
+    public static UserModel createSavedUser(RoleModel role) {
         return UserModel.builder()
                 .id(1L)
                 .name("Armando")

@@ -3,7 +3,7 @@ package com.pragma.powerup.domain.usecase;
 import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
 import com.pragma.powerup.domain.exception.NotAdultException;
-import com.pragma.powerup.domain.model.RolModel;
+import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
@@ -19,7 +19,6 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -36,7 +35,7 @@ class CreateUserUseCaseTest {
     private CreateUserUseCase createUserUseCase;
 
     private UserModel validUser;
-    private RolModel ownerRole;
+    private RoleModel ownerRole;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +53,6 @@ class CreateUserUseCaseTest {
         when(userPersistencePort.existsByEmail(validUser.getEmail())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(validUser.getDocumentNumber())).thenReturn(false);
         when(passwordEncoderPort.encode(validUser.getPassword())).thenReturn("encodedPassword");
-        when(userPersistencePort.getRoleById(2L)).thenReturn(ownerRole);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedUser);
 
         // Act
@@ -77,7 +75,6 @@ class CreateUserUseCaseTest {
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
         when(passwordEncoderPort.encode("secret123")).thenReturn("encodedPassword");
-        when(userPersistencePort.getRoleById(anyLong())).thenReturn(ownerRole);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validUser);
 
         // Act
@@ -93,7 +90,6 @@ class CreateUserUseCaseTest {
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
         when(passwordEncoderPort.encode(anyString())).thenReturn("encodedPassword");
-        when(userPersistencePort.getRoleById(2L)).thenReturn(ownerRole);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validUser);
 
         // Act
@@ -111,7 +107,6 @@ class CreateUserUseCaseTest {
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
         when(passwordEncoderPort.encode(anyString())).thenReturn("encodedPassword");
-        when(userPersistencePort.getRoleById(anyLong())).thenReturn(ownerRole);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(userExactly18);
 
         // Act & Assert
