@@ -5,6 +5,8 @@ import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
 import com.pragma.powerup.domain.exception.FunctionalException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
 import com.pragma.powerup.domain.exception.NotAdultException;
+import com.pragma.powerup.domain.exception.TechnicalException;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -109,22 +111,35 @@ public class ControllerAdvisor {
 
                 Map<String, Object> response = new LinkedHashMap<>();
                 response.put(MESSAGE, ex.getMessage());
-                if(!errorList.isEmpty()){
-                    response.put(ERRORS, errorList);
+                if (!errorList.isEmpty()) {
+                        response.put(ERRORS, errorList);
                 }
                 return response;
         }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleUnexpectedException(
-            Exception ex) {
+        @ExceptionHandler(TechnicalException.class)
+        public ResponseEntity<Map<String, Object>> handleTechnicalException(
+                        TechnicalException ex) {
 
-        log.error("Unexpected error", ex);
+                log.error("Technical error: {}", ex.getMessage(), ex);
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put(MESSAGE, AN_UNEXPECTED_ERROR_OCCURRED);
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put(MESSAGE, AN_UNEXPECTED_ERROR_OCCURRED);
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(response);
-    }
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(response);
+        }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<Map<String, Object>> handleUnexpectedException(
+                        Exception ex) {
+
+                log.error("Unexpected error", ex);
+
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put(MESSAGE, AN_UNEXPECTED_ERROR_OCCURRED);
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(response);
+        }
 }
