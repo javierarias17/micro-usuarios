@@ -38,4 +38,10 @@ public class UserJpaAdapter implements IUserPersistencePort {
     public boolean existsByDocumentNumber(String documentNumber) {
         return userRepository.existsByDocumentNumber(documentNumber);
     }
+
+    @Override
+    public Optional<UserModel> getUserById(Long id) {
+        return userRepository.findById(id)
+                .map(userEntityMapper::toUserModel);
+    }
 }

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +29,7 @@ public class UserRestController {
 
         private final IUserHandler userHandler;
 
-        @Operation(summary = "Create user", description = "Creates a new user.")
+        @Operation(summary = "Create user", description = "Creates a new user")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "201", description = "User created successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserResponseDto.class))),
                         @ApiResponse(responseCode = "409", description = "Email or document number already exists in the system", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Business validation failed\",\"errors\":[{\"field\":\"email\",\"message\":\"Mail already exists in the system\"}]}"))),
@@ -37,5 +39,16 @@ public class UserRestController {
         @PostMapping("/")
         public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
                 return ResponseEntity.status(HttpStatus.CREATED).body(userHandler.createUser(userRequestDto));
+        }
+
+        @Operation(summary = "Check if user is owner", description = "Returns true if the user with the given ID has the OWNER role")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Validation result returned", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "true"))),
+                        @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"User not found in the system\"}"))),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"An unexpected error occurred. Please contact the administrator.\"}")))
+        })
+        @GetMapping("/{id}/is-owner")
+        public ResponseEntity<Boolean> isOwner(@PathVariable Long id) {
+                return ResponseEntity.ok(userHandler.isOwner(id));
         }
 }

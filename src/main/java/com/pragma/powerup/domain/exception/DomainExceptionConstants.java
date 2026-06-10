@@ -1,7 +1,7 @@
 package com.pragma.powerup.domain.exception;
 
-public class Constants {
-    private Constants() {
+public class DomainExceptionConstants {
+    private DomainExceptionConstants() {
         throw new IllegalStateException("Utility class");
     }
     public static final String BIRTH_DATE = "birthDate";

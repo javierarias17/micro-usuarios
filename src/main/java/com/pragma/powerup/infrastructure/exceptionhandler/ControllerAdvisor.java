@@ -7,6 +7,7 @@ import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
 import com.pragma.powerup.domain.exception.NotAdultException;
 import com.pragma.powerup.domain.exception.TechnicalException;
 
+import com.pragma.powerup.domain.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -98,6 +99,12 @@ public class ControllerAdvisor {
         public ResponseEntity<Map<String, Object>> handleNotAdultException(
                         NotAdultException ex) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildErrorResponse(ex));
+        }
+
+        @ExceptionHandler(UserNotFoundException.class)
+        public ResponseEntity<Map<String, Object>> handleUserNotFoundException(
+                        UserNotFoundException ex) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildErrorResponse(ex));
         }
 
         private Map<String, Object> buildErrorResponse(FunctionalException ex) {

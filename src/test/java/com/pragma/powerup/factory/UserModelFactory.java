@@ -19,6 +19,14 @@ public class UserModelFactory {
                 .build();
     }
 
+    public static RoleModel createNonOwnerRole() {
+        return RoleModel.builder()
+                .id(1L)
+                .name("CLIENT")
+                .description("Regular client")
+                .build();
+    }
+
     public static UserModel createValidUser() {
         return UserModel.builder()
                 .name("Armando")
