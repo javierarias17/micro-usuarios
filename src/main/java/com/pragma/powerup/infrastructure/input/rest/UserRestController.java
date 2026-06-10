@@ -29,11 +29,16 @@ public class UserRestController {
 
         private final IUserHandler userHandler;
 
-        @Operation(summary = "Create user", description = "Creates a new user")
+        @Operation(summary = "Create user", description = "Creates a new user. Requires ADMIN role.")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "201", description = "User created successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserResponseDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Invalid fields or user is not of legal age", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
+                                @ExampleObject(name = "Validation failed", value = "{\"message\":\"Validation failed\",\"errors\":[{\"field\":\"birthDate\",\"message\":\"Birth date is required\"},{\"field\":\"email\",\"message\":\"Email must have a valid format\"}]}"),
+                                @ExampleObject(name = "Not adult", value = "{\"message\":\"Business validation failed\",\"errors\":[{\"field\":\"birthDate\",\"message\":\"User must be of legal age\"}]}")
+                        })),
+                        @ApiResponse(responseCode = "401", description = "Missing or invalid JWT token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"No authentication token provided.\"}"))),
+                        @ApiResponse(responseCode = "403", description = "Authenticated user does not have ADMIN role", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Access Denied\"}"))),
                         @ApiResponse(responseCode = "409", description = "Email or document number already exists in the system", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Business validation failed\",\"errors\":[{\"field\":\"email\",\"message\":\"Mail already exists in the system\"}]}"))),
-                        @ApiResponse(responseCode = "400", description = "User must be of legal age or invalid fields", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Validation failed\",\"errors\":[{\"field\":\"birthDate\",\"message\":\"Birth date is required\"},{\"field\":\"email\",\"message\":\"Email must have a valid format\"}]}"))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"An unexpected error occurred. Please contact the administrator.\"}")))
         })
         @PostMapping("/")
@@ -41,9 +46,11 @@ public class UserRestController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(userHandler.createUser(userRequestDto));
         }
 
-        @Operation(summary = "Check if user is owner", description = "Returns true if the user with the given ID has the OWNER role")
+        @Operation(summary = "Check if user is owner", description = "Returns true if the user with the given ID has the OWNER role. Requires ADMIN role.")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "Validation result returned", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "true"))),
+                        @ApiResponse(responseCode = "401", description = "Missing or invalid JWT token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"No authentication token provided.\"}"))),
+                        @ApiResponse(responseCode = "403", description = "Authenticated user does not have ADMIN role", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Access Denied\"}"))),
                         @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"User not found in the system\"}"))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"An unexpected error occurred. Please contact the administrator.\"}")))
         })
