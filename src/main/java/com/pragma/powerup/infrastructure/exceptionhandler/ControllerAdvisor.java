@@ -3,10 +3,10 @@ package com.pragma.powerup.infrastructure.exceptionhandler;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
 import com.pragma.powerup.domain.exception.FunctionalException;
+import com.pragma.powerup.domain.exception.InvalidCredentialsException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
 import com.pragma.powerup.domain.exception.NotAdultException;
 import com.pragma.powerup.domain.exception.TechnicalException;
-
 import com.pragma.powerup.domain.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -105,6 +105,12 @@ public class ControllerAdvisor {
         public ResponseEntity<Map<String, Object>> handleUserNotFoundException(
                         UserNotFoundException ex) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildErrorResponse(ex));
+        }
+
+        @ExceptionHandler(InvalidCredentialsException.class)
+        public ResponseEntity<Map<String, Object>> handleInvalidCredentialsException(
+                        InvalidCredentialsException ex) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(buildErrorResponse(ex));
         }
 
         private Map<String, Object> buildErrorResponse(FunctionalException ex) {

@@ -1,10 +1,13 @@
 package com.pragma.powerup.infrastructure.configuration;
 
+import com.pragma.powerup.domain.api.IAuthServicePort;
 import com.pragma.powerup.domain.api.ICreateUserServicePort;
 import com.pragma.powerup.domain.api.IValidateUserRoleServicePort;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IRolePersistencePort;
+import com.pragma.powerup.domain.spi.ITokenServicePort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.domain.usecase.AuthUseCase;
 import com.pragma.powerup.domain.usecase.CreateUserUseCase;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.RoleJpaAdapter;
 
@@ -29,6 +32,7 @@ public class BeanConfiguration {
     private final IRoleEntityMapper roleEntityMapper;
 
     private final IPasswordEncoderPort passwordEncoderPort;
+    private final ITokenServicePort tokenServicePort;
 
     @Bean
     public IUserPersistencePort userPersistencePort() {
@@ -48,5 +52,10 @@ public class BeanConfiguration {
     @Bean
     public IValidateUserRoleServicePort validateUserRoleServicePort() {
         return new ValidateUserRoleUseCase(userPersistencePort());
+    }
+
+    @Bean
+    public IAuthServicePort authServicePort() {
+        return new AuthUseCase(userPersistencePort(), passwordEncoderPort, tokenServicePort);
     }
 }
