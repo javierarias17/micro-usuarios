@@ -1,9 +1,10 @@
 package com.pragma.powerup.infrastructure.out.jpa.adapter;
 
 import com.pragma.powerup.domain.exception.TechnicalException;
-import com.pragma.powerup.domain.exception.TechnicalExceptionResponse;
+import com.pragma.powerup.domain.exception.constant.TechnicalMessageConstants;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.infrastructure.out.jpa.entity.UserEntity;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IRoleRepository;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IUserRepository;
@@ -20,11 +21,11 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     @Override
     public UserModel saveUser(UserModel userModel) {
-        var userEntity = userEntityMapper.toEntity(userModel);
+        UserEntity userEntity = userEntityMapper.toEntity(userModel);
         if (userModel.getRole() != null) {
             userEntity.setRole(Optional.ofNullable(userModel.getRole().getId())
                     .flatMap(roleRepository::findById)
-                    .orElseThrow(() -> new TechnicalException(TechnicalExceptionResponse.ROLE_NOT_FOUND.getMessage())));
+                    .orElseThrow(() -> new TechnicalException(TechnicalMessageConstants.ROLE_NOT_FOUND)));
         }
         return userEntityMapper.toUserModel(userRepository.save(userEntity));
     }

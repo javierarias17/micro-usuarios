@@ -51,6 +51,20 @@ public class UserModelFactory {
                 .build();
     }
 
+    public static UserModel createSavedUserWithPassword(RoleModel role, String encodedPassword) {
+        return UserModel.builder()
+                .id(1L)
+                .name("Armando")
+                .lastName("Diaz")
+                .documentNumber("1061769969")
+                .phone("+573197633852")
+                .birthDate(LocalDate.of(1993, 9, 17))
+                .email("armando-diaz@gmail.com")
+                .password(encodedPassword)
+                .role(role)
+                .build();
+    }
+
     public static UserModel createSavedUser(RoleModel role) {
         return UserModel.builder()
                 .id(1L)

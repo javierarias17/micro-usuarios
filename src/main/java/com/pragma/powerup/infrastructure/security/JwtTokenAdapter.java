@@ -25,6 +25,12 @@ public class JwtTokenAdapter implements ITokenServicePort {
     private static final String CLAIM_ROLE_ID = "roleId";
     private static final String CLAIM_USER_ID = "userId";
 
+    private static final String MSG_TOKEN_EXPIRED = "Token has expired. Please log in again.";
+    private static final String MSG_TOKEN_SIGNATURE_INVALID = "Token signature is invalid.";
+    private static final String MSG_TOKEN_FORMAT_INVALID = "Token format is invalid.";
+    private static final String MSG_TOKEN_TYPE_UNSUPPORTED = "Token type is not supported.";
+    private static final String MSG_TOKEN_EMPTY_OR_NULL = "Token is empty or null.";
+
     @Value("${jwt.secret}")
     private String secret;
 
@@ -67,15 +73,15 @@ public class JwtTokenAdapter implements ITokenServicePort {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new InvalidTokenException("Token has expired. Please log in again.");
+            throw new InvalidTokenException(MSG_TOKEN_EXPIRED);
         } catch (SignatureException e) {
-            throw new InvalidTokenException("Token signature is invalid.");
+            throw new InvalidTokenException(MSG_TOKEN_SIGNATURE_INVALID);
         } catch (MalformedJwtException e) {
-            throw new InvalidTokenException("Token format is invalid.");
+            throw new InvalidTokenException(MSG_TOKEN_FORMAT_INVALID);
         } catch (UnsupportedJwtException e) {
-            throw new InvalidTokenException("Token type is not supported.");
+            throw new InvalidTokenException(MSG_TOKEN_TYPE_UNSUPPORTED);
         } catch (IllegalArgumentException e) {
-            throw new InvalidTokenException("Token is empty or null.");
+            throw new InvalidTokenException(MSG_TOKEN_EMPTY_OR_NULL);
         }
     }
 

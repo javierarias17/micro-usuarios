@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CreateUserUseCaseTest {
+class CreateOwnerUseCaseTest {
 
     @Mock
     private IUserPersistencePort userPersistencePort;
@@ -32,7 +32,7 @@ class CreateUserUseCaseTest {
     private IPasswordEncoderPort passwordEncoderPort;
 
     @InjectMocks
-    private CreateUserUseCase createUserUseCase;
+    private CreateOwnerUseCase createOwnerUseCase;
 
     private UserModel validUser;
     private RoleModel ownerRole;
@@ -46,7 +46,7 @@ class CreateUserUseCaseTest {
     // ─── Happy path
 
     @Test
-    void When_UserInformationIsCorrect_Expect_UserToBeSavedSuccessfully() {
+    void When_OwnerInformationIsCorrect_Expect_OwnerToBeSavedSuccessfully() {
         // Arrange
         UserModel savedUser = UserModelFactory.createSavedUser(ownerRole);
 
@@ -56,7 +56,7 @@ class CreateUserUseCaseTest {
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedUser);
 
         // Act
-        UserModel result = createUserUseCase.createUser(validUser);
+        UserModel result = createOwnerUseCase.createOwner(validUser);
 
         // Assert
         assertNotNull(result);
@@ -70,7 +70,7 @@ class CreateUserUseCaseTest {
     }
 
     @Test
-    void When_UserInformationIsCorrect_Expect_PasswordToBeEncoded() {
+    void When_OwnerInformationIsCorrect_Expect_PasswordToBeEncoded() {
         // Arrange
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
@@ -78,14 +78,14 @@ class CreateUserUseCaseTest {
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validUser);
 
         // Act
-        UserModel result = createUserUseCase.createUser(validUser);
+        UserModel result = createOwnerUseCase.createOwner(validUser);
 
         // Assert
         assertEquals("encodedPassword", result.getPassword());
     }
 
     @Test
-    void When_UserInformationIsCorrect_Expect_OwnerRoleToBeAssigned() {
+    void When_OwnerInformationIsCorrect_Expect_OwnerRoleToBeAssigned() {
         // Arrange
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
@@ -93,14 +93,14 @@ class CreateUserUseCaseTest {
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validUser);
 
         // Act
-        UserModel result = createUserUseCase.createUser(validUser);
+        UserModel result = createOwnerUseCase.createOwner(validUser);
 
         // Assert
         assertEquals(ownerRole.getId(), result.getRole().getId());
     }
 
     @Test
-    void When_UserIsExactly18YearsOld_Expect_UserToBeSavedSuccessfully() {
+    void When_OwnerIsExactly18YearsOld_Expect_OwnerToBeSavedSuccessfully() {
         // Arrange
         UserModel userExactly18 = UserModelFactory.createUserWithBirthDate(LocalDate.now().minusYears(18));
 
@@ -110,7 +110,7 @@ class CreateUserUseCaseTest {
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(userExactly18);
 
         // Act & Assert
-        assertDoesNotThrow(() -> createUserUseCase.createUser(userExactly18));
+        assertDoesNotThrow(() -> createOwnerUseCase.createOwner(userExactly18));
     }
 
     // ─── Exceptions path
@@ -122,7 +122,7 @@ class CreateUserUseCaseTest {
 
         // Act & Assert
         assertThrows(MailAlreadyExistsException.class,
-                () -> createUserUseCase.createUser(validUser));
+                () -> createOwnerUseCase.createOwner(validUser));
     }
 
     @Test
@@ -133,11 +133,11 @@ class CreateUserUseCaseTest {
 
         // Act & Assert
         assertThrows(DocumentNumberAlreadyExistsException.class,
-                () -> createUserUseCase.createUser(validUser));
+                () -> createOwnerUseCase.createOwner(validUser));
     }
 
     @Test
-    void Expect_NotAdultException_When_UserIsUnderage() {
+    void Expect_NotAdultException_When_OwnerIsUnderage() {
         // Arrange
         UserModel userUnder18 = UserModelFactory.createUserWithBirthDate(LocalDate.now().minusYears(17));
 
@@ -146,6 +146,6 @@ class CreateUserUseCaseTest {
 
         // Act & Assert
         assertThrows(NotAdultException.class,
-                () -> createUserUseCase.createUser(userUnder18));
+                () -> createOwnerUseCase.createOwner(userUnder18));
     }
 }

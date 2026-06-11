@@ -1,7 +1,7 @@
 package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.api.IAuthServicePort;
-import com.pragma.powerup.domain.exception.FunctionalExceptionResponse;
+import com.pragma.powerup.domain.exception.constant.FunctionalMessageConstants;
 import com.pragma.powerup.domain.exception.InvalidCredentialsException;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
@@ -26,11 +26,11 @@ public class AuthUseCase implements IAuthServicePort {
     public String login(String email, String password) {
         UserModel user = userPersistencePort.findByEmail(email)
                 .orElseThrow(() -> new InvalidCredentialsException(
-                        FunctionalExceptionResponse.INVALID_CREDENTIALS.getMessage()));
+                        FunctionalMessageConstants.INVALID_CREDENTIALS));
 
         if (!passwordEncoderPort.matches(password, user.getPassword())) {
             throw new InvalidCredentialsException(
-                    FunctionalExceptionResponse.INVALID_CREDENTIALS.getMessage());
+                    FunctionalMessageConstants.INVALID_CREDENTIALS);
         }
 
         return tokenServicePort.generateToken(user.getEmail(), user.getRole().getName(), user.getRole().getId(), user.getId());

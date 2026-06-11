@@ -15,6 +15,8 @@ import java.util.Map;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+    private static final String RESPONSE_MESSAGE_KEY = "message";
+
     @Override
     public void commence(HttpServletRequest request,
             HttpServletResponse response,
@@ -22,6 +24,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(),
-                Map.of("message", (String) request.getAttribute(JwtAuthenticationFilter.MESSAGE_SECURITY)));
+                Map.of(RESPONSE_MESSAGE_KEY, (String) request.getAttribute(JwtAuthenticationFilter.MESSAGE_SECURITY)));
     }
 }

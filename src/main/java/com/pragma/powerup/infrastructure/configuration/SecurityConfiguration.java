@@ -22,6 +22,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
+    private static final String ENDPOINT_AUTH_LOGIN = "/api/v1/auth/login";
+
+    private static final String ENDPOINT_USER_CREATE_OWNER = "/api/v1/user/owner";
+    private static final String ENDPOINT_USER_IS_OWNER = "/api/v1/user/*/is-owner";
+
+    private static final String SWAGGER_API_DOCS_PATH = "/v3/api-docs/**";
+    private static final String SWAGGER_UI_PATH = "/swagger-ui/**";
+    private static final String SWAGGER_HTML_PATH = "/swagger-ui.html";
+
+    private static final String ROLE_ADMIN = "ADMIN";
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -37,10 +48,10 @@ public class SecurityConfiguration {
                 .accessDeniedHandler(jwtAccessDeniedHandler)
                 .and()
                 .authorizeHttpRequests(auth -> auth
-                        .antMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
-                        .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .antMatchers(HttpMethod.GET, "/api/v1/user/*/is-owner").hasRole("ADMIN")
-                        .antMatchers(HttpMethod.POST, "/api/v1/user/").hasRole("ADMIN")
+                        .antMatchers(HttpMethod.POST, ENDPOINT_AUTH_LOGIN).permitAll()
+                        .antMatchers(SWAGGER_API_DOCS_PATH, SWAGGER_UI_PATH, SWAGGER_HTML_PATH).permitAll()
+                        .antMatchers(HttpMethod.GET, ENDPOINT_USER_IS_OWNER).hasRole(ROLE_ADMIN)
+                        .antMatchers(HttpMethod.POST, ENDPOINT_USER_CREATE_OWNER).hasRole(ROLE_ADMIN)
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
