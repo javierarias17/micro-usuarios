@@ -36,7 +36,7 @@ class ValidateUserRoleUseCaseTest {
         ownerUserWithoutRole = UserModelFactory.createSavedUser(null);
     }
 
-    // ─── Happy path
+    // ─── isOwner: Happy path
 
     @Test
     void When_UserExistsAndHasOwnerRole_Expect_TrueReturned() {
@@ -63,7 +63,7 @@ class ValidateUserRoleUseCaseTest {
     }
 
     @Test
-    void When_UserExistsWithNoRole_Expect_FalseReturned() {
+    void When_UserExistsWithNoRole_Expect_FalseReturnedForIsOwner() {
         // Es test aumenta cobertura; no hace parte de un criterio de aceptación
         // Arrange
         when(userPersistencePort.getUserById(ownerUserWithoutRole.getId()))
@@ -79,7 +79,7 @@ class ValidateUserRoleUseCaseTest {
     // ─── Exceptions path
 
     @Test
-    void Expect_UserNotFoundException_When_UserDoesNotExist() {
+    void Expect_UserNotFoundException_When_UserDoesNotExistForIsOwner() {
         // Arrange
         Long nonExistentUserId = 99L;
         when(userPersistencePort.getUserById(nonExistentUserId)).thenReturn(Optional.empty());
@@ -87,5 +87,58 @@ class ValidateUserRoleUseCaseTest {
         // Act & Assert
         assertThrows(UserNotFoundException.class,
                 () -> validateUserRoleUseCase.isOwner(nonExistentUserId));
+    }
+
+    // ─── isEmployee: Happy path
+
+    @Test
+    void When_UserExistsAndHasEmployeeRole_Expect_TrueReturned() {
+        // Arrange
+        UserModel employeeUser = UserModelFactory.createSavedUser(UserModelFactory.createEmployeeRole());
+        when(userPersistencePort.getUserById(employeeUser.getId())).thenReturn(Optional.of(employeeUser));
+
+        // Act
+        boolean result = validateUserRoleUseCase.isEmployee(employeeUser.getId());
+
+        // Assert
+        assertTrue(result);
+    }
+
+    @Test
+    void When_UserExistsAndHasNonEmployeeRole_Expect_FalseReturned() {
+        // Arrange
+        when(userPersistencePort.getUserById(nonOwnerUser.getId())).thenReturn(Optional.of(nonOwnerUser));
+
+        // Act
+        boolean result = validateUserRoleUseCase.isEmployee(nonOwnerUser.getId());
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
+    void When_UserExistsWithNoRole_Expect_FalseReturnedForIsEmployee() {
+        // Arrange
+        when(userPersistencePort.getUserById(ownerUserWithoutRole.getId()))
+                .thenReturn(Optional.of(ownerUserWithoutRole));
+
+        // Act
+        boolean result = validateUserRoleUseCase.isEmployee(ownerUserWithoutRole.getId());
+
+        // Assert
+        assertFalse(result);
+    }
+
+    // ─── isEmployee: Exceptions path
+
+    @Test
+    void Expect_UserNotFoundException_When_UserDoesNotExistForIsEmployee() {
+        // Arrange
+        Long nonExistentUserId = 99L;
+        when(userPersistencePort.getUserById(nonExistentUserId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(UserNotFoundException.class,
+                () -> validateUserRoleUseCase.isEmployee(nonExistentUserId));
     }
 }

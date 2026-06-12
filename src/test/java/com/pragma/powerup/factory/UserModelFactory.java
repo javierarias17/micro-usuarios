@@ -27,6 +27,14 @@ public class UserModelFactory {
                 .build();
     }
 
+    public static RoleModel createEmployeeRole() {
+        return RoleModel.builder()
+                .id(3L)
+                .name("EMPLOYEE")
+                .description("Restaurant employee")
+                .build();
+    }
+
     public static UserModel createValidUser() {
         return UserModel.builder()
                 .name("Armando")

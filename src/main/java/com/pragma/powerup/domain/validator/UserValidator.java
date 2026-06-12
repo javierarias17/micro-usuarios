@@ -18,35 +18,40 @@ public class UserValidator {
     public static void validateForEmployeeCreation(UserModel user) {
         Map<String, String> errors = new LinkedHashMap<>();
 
-        if (isBlank(user.getName()))
-            errors.put(FieldConstants.NAME, ValidationMessageConstants.MSG_NAME_REQUIRED);
+        FieldValidator.validateNotBlank(user.getName(), FieldConstants.NAME,
+                ValidationMessageConstants.MSG_NAME_REQUIRED, errors);
 
-        if (isBlank(user.getLastName()))
-            errors.put(FieldConstants.LAST_NAME, ValidationMessageConstants.MSG_LAST_NAME_REQUIRED);
+        FieldValidator.validateNotBlank(user.getLastName(), FieldConstants.LAST_NAME,
+                ValidationMessageConstants.MSG_LAST_NAME_REQUIRED, errors);
 
-        if (isBlank(user.getDocumentNumber()))
-            errors.put(FieldConstants.DOCUMENT_NUMBER, ValidationMessageConstants.MSG_DOCUMENT_NUMBER_REQUIRED);
-        else if (!user.getDocumentNumber().matches(RegexConstants.DOCUMENT_NUMBER_REGEX))
-            errors.put(FieldConstants.DOCUMENT_NUMBER, ValidationMessageConstants.MSG_DOCUMENT_NUMBER_DIGITS_ONLY);
+        FieldValidator.validateNotBlankAndPattern(
+                user.getDocumentNumber(),
+                FieldConstants.DOCUMENT_NUMBER,
+                ValidationMessageConstants.MSG_DOCUMENT_NUMBER_REQUIRED,
+                RegexConstants.DOCUMENT_NUMBER_REGEX,
+                ValidationMessageConstants.MSG_DOCUMENT_NUMBER_DIGITS_ONLY,
+                errors);
 
-        if (isBlank(user.getPhone()))
-            errors.put(FieldConstants.PHONE, ValidationMessageConstants.MSG_PHONE_REQUIRED);
-        else if (!user.getPhone().matches(RegexConstants.PHONE_REGEX))
-            errors.put(FieldConstants.PHONE, ValidationMessageConstants.MSG_PHONE_FORMAT);
+        FieldValidator.validateNotBlankAndPattern(
+                user.getPhone(),
+                FieldConstants.PHONE,
+                ValidationMessageConstants.MSG_PHONE_REQUIRED,
+                RegexConstants.PHONE_REGEX,
+                ValidationMessageConstants.MSG_PHONE_FORMAT,
+                errors);
 
-        if (isBlank(user.getEmail()))
-            errors.put(FieldConstants.EMAIL, ValidationMessageConstants.MSG_EMAIL_REQUIRED);
-        else if (!user.getEmail().matches(RegexConstants.EMAIL_REGEX))
-            errors.put(FieldConstants.EMAIL, ValidationMessageConstants.MSG_EMAIL_FORMAT);
+        FieldValidator.validateNotBlankAndPattern(
+                user.getEmail(),
+                FieldConstants.EMAIL,
+                ValidationMessageConstants.MSG_EMAIL_REQUIRED,
+                RegexConstants.EMAIL_REGEX,
+                ValidationMessageConstants.MSG_EMAIL_FORMAT,
+                errors);
 
-        if (isBlank(user.getPassword()))
-            errors.put(FieldConstants.PASSWORD, ValidationMessageConstants.MSG_PASSWORD_REQUIRED);
+        FieldValidator.validateNotBlank(user.getPassword(), FieldConstants.PASSWORD,
+                ValidationMessageConstants.MSG_PASSWORD_REQUIRED, errors);
 
         if (!errors.isEmpty())
             throw new FieldsValidationException(errors);
-    }
-
-    private static boolean isBlank(String value) {
-        return value == null || value.isBlank();
     }
 }
