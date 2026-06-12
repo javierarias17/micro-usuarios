@@ -25,13 +25,16 @@ public class SecurityConfiguration {
     private static final String ENDPOINT_AUTH_LOGIN = "/api/v1/auth/login";
 
     private static final String ENDPOINT_USER_CREATE_OWNER = "/api/v1/user/owner";
+    private static final String ENDPOINT_USER_CREATE_EMPLOYEE = "/api/v1/user/employee";
     private static final String ENDPOINT_USER_IS_OWNER = "/api/v1/user/*/is-owner";
+    private static final String ENDPOINT_USER_IS_EMPLOYEE = "/api/v1/user/*/is-employee";
 
     private static final String SWAGGER_API_DOCS_PATH = "/v3/api-docs/**";
     private static final String SWAGGER_UI_PATH = "/swagger-ui/**";
     private static final String SWAGGER_HTML_PATH = "/swagger-ui.html";
 
     private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_OWNER = "OWNER";
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -52,6 +55,8 @@ public class SecurityConfiguration {
                         .antMatchers(SWAGGER_API_DOCS_PATH, SWAGGER_UI_PATH, SWAGGER_HTML_PATH).permitAll()
                         .antMatchers(HttpMethod.GET, ENDPOINT_USER_IS_OWNER).hasRole(ROLE_ADMIN)
                         .antMatchers(HttpMethod.POST, ENDPOINT_USER_CREATE_OWNER).hasRole(ROLE_ADMIN)
+                        .antMatchers(HttpMethod.POST, ENDPOINT_USER_CREATE_EMPLOYEE).hasRole(ROLE_OWNER)
+                        .antMatchers(HttpMethod.GET, ENDPOINT_USER_IS_EMPLOYEE).hasRole(ROLE_OWNER)
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

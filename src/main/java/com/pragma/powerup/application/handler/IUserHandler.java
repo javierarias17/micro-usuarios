@@ -1,9 +1,12 @@
 package com.pragma.powerup.application.handler;
 
-import com.pragma.powerup.application.dto.request.UserRequestDto;
+import com.pragma.powerup.application.dto.request.EmployeeRequestDto;
+import com.pragma.powerup.application.dto.request.OwnerRequestDto;
 import com.pragma.powerup.application.dto.response.UserResponseDto;
 
 public interface IUserHandler {
-    UserResponseDto createOwner(UserRequestDto userRequestDto);
+    UserResponseDto createOwner(OwnerRequestDto ownerRequestDto);
+    UserResponseDto createEmployee(EmployeeRequestDto employeeRequestDto);
     boolean isOwner(Long userId);
+    boolean isEmployee(Long userId);
 }

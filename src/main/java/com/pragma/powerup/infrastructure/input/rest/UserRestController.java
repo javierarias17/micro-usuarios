@@ -1,6 +1,7 @@
 package com.pragma.powerup.infrastructure.input.rest;
 
-import com.pragma.powerup.application.dto.request.UserRequestDto;
+import com.pragma.powerup.application.dto.request.EmployeeRequestDto;
+import com.pragma.powerup.application.dto.request.OwnerRequestDto;
 import com.pragma.powerup.application.dto.response.UserResponseDto;
 import com.pragma.powerup.application.handler.IUserHandler;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +25,25 @@ public class UserRestController implements IUserRestControllerDocs {
 
     @Override
     @PostMapping("/owner")
-    public ResponseEntity<UserResponseDto> createOwner(@Valid @RequestBody UserRequestDto userRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userHandler.createOwner(userRequestDto));
+    public ResponseEntity<UserResponseDto> createOwner(@Valid @RequestBody OwnerRequestDto ownerRequestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userHandler.createOwner(ownerRequestDto));
+    }
+
+    @Override
+    @PostMapping("/employee")
+    public ResponseEntity<UserResponseDto> createEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userHandler.createEmployee(employeeRequestDto));
     }
 
     @Override
     @GetMapping("/{id}/is-owner")
     public ResponseEntity<Boolean> isOwner(@PathVariable Long id) {
         return ResponseEntity.ok(userHandler.isOwner(id));
+    }
+
+    @Override
+    @GetMapping("/{id}/is-employee")
+    public ResponseEntity<Boolean> isEmployee(@PathVariable Long id) {
+        return ResponseEntity.ok(userHandler.isEmployee(id));
     }
 }

@@ -1,12 +1,13 @@
 package com.pragma.powerup.application.handler.impl;
 
-import com.pragma.powerup.application.dto.request.UserRequestDto;
+import com.pragma.powerup.application.dto.request.EmployeeRequestDto;
+import com.pragma.powerup.application.dto.request.OwnerRequestDto;
 import com.pragma.powerup.application.dto.response.UserResponseDto;
 import com.pragma.powerup.application.handler.IUserHandler;
 import com.pragma.powerup.application.mapper.IUserRequestMapper;
 import com.pragma.powerup.application.mapper.IUserResponseMapper;
+import com.pragma.powerup.domain.api.ICreateEmployeeServicePort;
 import com.pragma.powerup.domain.api.ICreateOwnerServicePort;
-
 import com.pragma.powerup.domain.api.IValidateUserRoleServicePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,18 +19,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserHandler implements IUserHandler {
 
     private final ICreateOwnerServicePort createOwnerServicePort;
+    private final ICreateEmployeeServicePort createEmployeeServicePort;
     private final IValidateUserRoleServicePort validateUserRoleServicePort;
     private final IUserRequestMapper userRequestMapper;
     private final IUserResponseMapper userResponseMapper;
 
     @Override
-    public UserResponseDto createOwner(UserRequestDto userRequestDto) {
+    public UserResponseDto createOwner(OwnerRequestDto ownerRequestDto) {
         return userResponseMapper.toResponse(
-                createOwnerServicePort.createOwner(userRequestMapper.toUser(userRequestDto)));
+                createOwnerServicePort.createOwner(userRequestMapper.toUserFromOwner(ownerRequestDto)));
+    }
+
+    @Override
+    public UserResponseDto createEmployee(EmployeeRequestDto employeeRequestDto) {
+        return userResponseMapper.toResponse(
+                createEmployeeServicePort.createEmployee(userRequestMapper.toUserFromEmployee(employeeRequestDto)));
     }
 
     @Override
     public boolean isOwner(Long userId) {
         return validateUserRoleServicePort.isOwner(userId);
+    }
+
+    @Override
+    public boolean isEmployee(Long userId) {
+        return validateUserRoleServicePort.isEmployee(userId);
     }
 }

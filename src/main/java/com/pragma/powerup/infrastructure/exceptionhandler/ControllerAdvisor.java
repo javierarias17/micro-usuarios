@@ -2,6 +2,7 @@ package com.pragma.powerup.infrastructure.exceptionhandler;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
+import com.pragma.powerup.domain.exception.FieldsValidationException;
 import com.pragma.powerup.domain.exception.FunctionalException;
 import com.pragma.powerup.domain.exception.InvalidCredentialsException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
@@ -81,6 +82,12 @@ public class ControllerAdvisor {
                 response.put(ERRORS, errors);
 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        @ExceptionHandler(FieldsValidationException.class)
+        public ResponseEntity<Map<String, Object>> handleFieldsValidationException(
+                        FieldsValidationException ex) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildErrorResponse(ex));
         }
 
         @ExceptionHandler(MailAlreadyExistsException.class)

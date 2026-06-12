@@ -20,4 +20,11 @@ public class ValidateUserRoleUseCase implements IValidateUserRoleServicePort {
                 .orElseThrow(UserNotFoundException::new);
         return user.getRole() != null && DomainConstants.OWNER_ROLE_ID.equals(user.getRole().getId());
     }
+
+    @Override
+    public boolean isEmployee(Long userId) {
+        UserModel user = userPersistencePort.getUserById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        return user.getRole() != null && DomainConstants.EMPLOYEE_ROLE_ID.equals(user.getRole().getId());
+    }
 }
