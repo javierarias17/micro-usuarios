@@ -1,5 +1,6 @@
 package com.pragma.powerup.infrastructure.input.rest;
 
+import com.pragma.powerup.application.dto.request.CustomerRequestDto;
 import com.pragma.powerup.application.dto.request.EmployeeRequestDto;
 import com.pragma.powerup.application.dto.request.OwnerRequestDto;
 import com.pragma.powerup.application.dto.response.UserResponseDto;
@@ -38,6 +39,15 @@ public interface IUserRestControllerDocs {
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"An unexpected error occurred. Please contact the administrator.\"}")))
         })
         ResponseEntity<UserResponseDto> createEmployee(EmployeeRequestDto employeeRequestDto);
+
+        @Operation(summary = "Create customer", description = "Creates a new customer user account. Public endpoint — no authentication required.")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "201", description = "Customer created successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserResponseDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Invalid fields", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Business validation failed\",\"errors\":[{\"field\":\"email\",\"message\":\"Email must have a valid format\"}]}"))),
+                        @ApiResponse(responseCode = "409", description = "Email or document number already exists", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Business validation failed\",\"errors\":[{\"field\":\"email\",\"message\":\"Mail already exists in the system\"}]}"))),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"An unexpected error occurred. Please contact the administrator.\"}")))
+        })
+        ResponseEntity<UserResponseDto> createCustomer(CustomerRequestDto customerRequestDto);
 
         @Operation(summary = "Check if user is owner", description = "Returns true if the user with the given ID has the OWNER role. Requires ADMIN role.")
         @ApiResponses(value = {

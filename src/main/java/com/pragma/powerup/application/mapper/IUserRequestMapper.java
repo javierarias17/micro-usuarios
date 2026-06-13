@@ -1,5 +1,6 @@
 package com.pragma.powerup.application.mapper;
 
+import com.pragma.powerup.application.dto.request.CustomerRequestDto;
 import com.pragma.powerup.application.dto.request.EmployeeRequestDto;
 import com.pragma.powerup.application.dto.request.OwnerRequestDto;
 import com.pragma.powerup.domain.model.UserModel;
@@ -12,4 +13,5 @@ import org.mapstruct.ReportingPolicy;
 public interface IUserRequestMapper {
     UserModel toUserFromOwner(OwnerRequestDto ownerRequestDto);
     UserModel toUserFromEmployee(EmployeeRequestDto employeeRequestDto);
+    UserModel toUserFromCustomer(CustomerRequestDto customerRequestDto);
 }

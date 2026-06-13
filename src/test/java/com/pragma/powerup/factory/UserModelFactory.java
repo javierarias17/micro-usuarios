@@ -19,12 +19,16 @@ public class UserModelFactory {
                 .build();
     }
 
-    public static RoleModel createNonOwnerRole() {
+    public static RoleModel createCustomerRole() {
         return RoleModel.builder()
-                .id(1L)
-                .name("CLIENT")
-                .description("Regular client")
+                .id(4L)
+                .name("CUSTOMER")
+                .description("Regular customer")
                 .build();
+    }
+
+    public static RoleModel createNonOwnerRole() {
+        return createCustomerRole();
     }
 
     public static RoleModel createEmployeeRole() {

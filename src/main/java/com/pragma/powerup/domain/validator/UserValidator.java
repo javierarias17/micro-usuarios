@@ -15,6 +15,10 @@ public class UserValidator {
         throw new IllegalStateException("Utility class");
     }
 
+    public static void validateForCustomerCreation(UserModel user) {
+        validateForEmployeeCreation(user);
+    }
+
     public static void validateForEmployeeCreation(UserModel user) {
         Map<String, String> errors = new LinkedHashMap<>();
 

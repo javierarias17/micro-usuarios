@@ -25,6 +25,7 @@ public class SecurityConfiguration {
     private static final String ENDPOINT_AUTH_LOGIN = "/api/v1/auth/login";
 
     private static final String ENDPOINT_USER_CREATE_OWNER = "/api/v1/user/owner";
+    private static final String ENDPOINT_USER_CREATE_CUSTOMER = "/api/v1/user/customer";
     private static final String ENDPOINT_USER_CREATE_EMPLOYEE = "/api/v1/user/employee";
     private static final String ENDPOINT_USER_IS_OWNER = "/api/v1/user/*/is-owner";
     private static final String ENDPOINT_USER_IS_EMPLOYEE = "/api/v1/user/*/is-employee";
@@ -52,6 +53,7 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeHttpRequests(auth -> auth
                         .antMatchers(HttpMethod.POST, ENDPOINT_AUTH_LOGIN).permitAll()
+                        .antMatchers(HttpMethod.POST, ENDPOINT_USER_CREATE_CUSTOMER).permitAll()
                         .antMatchers(SWAGGER_API_DOCS_PATH, SWAGGER_UI_PATH, SWAGGER_HTML_PATH).permitAll()
                         .antMatchers(HttpMethod.GET, ENDPOINT_USER_IS_OWNER).hasRole(ROLE_ADMIN)
                         .antMatchers(HttpMethod.POST, ENDPOINT_USER_CREATE_OWNER).hasRole(ROLE_ADMIN)

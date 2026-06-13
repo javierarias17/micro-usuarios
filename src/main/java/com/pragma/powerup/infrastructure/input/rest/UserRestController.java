@@ -1,5 +1,6 @@
 package com.pragma.powerup.infrastructure.input.rest;
 
+import com.pragma.powerup.application.dto.request.CustomerRequestDto;
 import com.pragma.powerup.application.dto.request.EmployeeRequestDto;
 import com.pragma.powerup.application.dto.request.OwnerRequestDto;
 import com.pragma.powerup.application.dto.response.UserResponseDto;
@@ -33,6 +34,12 @@ public class UserRestController implements IUserRestControllerDocs {
     @PostMapping("/employee")
     public ResponseEntity<UserResponseDto> createEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userHandler.createEmployee(employeeRequestDto));
+    }
+
+    @Override
+    @PostMapping("/customer")
+    public ResponseEntity<UserResponseDto> createCustomer(@Valid @RequestBody CustomerRequestDto customerRequestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userHandler.createCustomer(customerRequestDto));
     }
 
     @Override
