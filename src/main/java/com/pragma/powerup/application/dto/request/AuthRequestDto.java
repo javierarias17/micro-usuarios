@@ -1,5 +1,6 @@
 package com.pragma.powerup.application.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pragma.powerup.domain.common.ValidationMessageConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -20,5 +21,6 @@ public class AuthRequestDto {
 
     @Schema(description = "User password", example = "secret123")
     @NotBlank(message = ValidationMessageConstants.MSG_PASSWORD_REQUIRED)
-    private String password;
+    @JsonProperty("password")
+    private String userPassword;
 }

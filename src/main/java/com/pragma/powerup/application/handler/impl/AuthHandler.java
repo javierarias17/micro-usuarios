@@ -15,7 +15,7 @@ public class AuthHandler implements IAuthHandler {
 
     @Override
     public AuthResponseDto login(AuthRequestDto authRequestDto) {
-        String token = authServicePort.login(authRequestDto.getEmail(), authRequestDto.getPassword());
+        String token = authServicePort.login(authRequestDto.getEmail(), authRequestDto.getUserPassword());
         return new AuthResponseDto(token);
     }
 }

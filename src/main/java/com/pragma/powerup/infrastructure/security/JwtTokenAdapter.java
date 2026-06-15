@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 
 @Component
@@ -44,8 +45,8 @@ public class JwtTokenAdapter implements ITokenServicePort {
                 .claim(CLAIM_ROLE, role)
                 .claim(CLAIM_ROLE_ID, roleId)
                 .claim(CLAIM_USER_ID, userId)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(Date.from(Instant.now().plusMillis(expiration)))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

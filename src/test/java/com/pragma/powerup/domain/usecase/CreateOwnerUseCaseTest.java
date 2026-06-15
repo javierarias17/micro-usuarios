@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -102,7 +103,7 @@ class CreateOwnerUseCaseTest {
     @Test
     void When_OwnerIsExactly18YearsOld_Expect_OwnerToBeSavedSuccessfully() {
         // Arrange
-        UserModel userExactly18 = UserModelFactory.createUserWithBirthDate(LocalDate.now().minusYears(18));
+        UserModel userExactly18 = UserModelFactory.createUserWithBirthDate(LocalDate.of(2006, Month.JUNE, 15));
 
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
@@ -139,7 +140,7 @@ class CreateOwnerUseCaseTest {
     @Test
     void Expect_NotAdultException_When_OwnerIsUnderage() {
         // Arrange
-        UserModel userUnder18 = UserModelFactory.createUserWithBirthDate(LocalDate.now().minusYears(17));
+        UserModel userUnder18 = UserModelFactory.createUserWithBirthDate(LocalDate.of(2015, Month.JUNE, 15));
 
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);

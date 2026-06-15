@@ -11,6 +11,7 @@ import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Map;
 
 public class CreateOwnerUseCase implements ICreateOwnerServicePort {
@@ -42,7 +43,7 @@ public class CreateOwnerUseCase implements ICreateOwnerServicePort {
             throw new DocumentNumberAlreadyExistsException(FunctionalMessageConstants.BUSINESS_VALIDATION_FAILED,
                     Map.of(FieldConstants.DOCUMENT_NUMBER, FunctionalMessageConstants.DOCUMENT_NUMBER_ALREADY_EXISTS));
         }
-        if (LocalDate.now().minusYears(MINIMUM_OWNER_AGE).isBefore(userModel.getBirthDate())) {
+        if (LocalDate.now(ZoneId.systemDefault()).minusYears(MINIMUM_OWNER_AGE).isBefore(userModel.getBirthDate())) {
             throw new NotAdultException(FunctionalMessageConstants.BUSINESS_VALIDATION_FAILED,
                     Map.of(FieldConstants.BIRTH_DATE, FunctionalMessageConstants.OWNER_NOT_OF_LEGAL_AGE));
         }

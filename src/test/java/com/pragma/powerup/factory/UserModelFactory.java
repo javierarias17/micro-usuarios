@@ -4,6 +4,7 @@ import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 public class UserModelFactory {
 
@@ -45,7 +46,7 @@ public class UserModelFactory {
                 .lastName("Diaz")
                 .documentNumber("1061769969")
                 .phone("+573197633852")
-                .birthDate(LocalDate.of(1993, 9, 17))
+                .birthDate(LocalDate.of(1993, Month.SEPTEMBER, 17))
                 .email("armando-diaz@gmail.com")
                 .password("secret123")
                 .build();
@@ -70,7 +71,7 @@ public class UserModelFactory {
                 .lastName("Diaz")
                 .documentNumber("1061769969")
                 .phone("+573197633852")
-                .birthDate(LocalDate.of(1993, 9, 17))
+                .birthDate(LocalDate.of(1993, Month.SEPTEMBER, 17))
                 .email("armando-diaz@gmail.com")
                 .password(encodedPassword)
                 .role(role)
@@ -84,7 +85,7 @@ public class UserModelFactory {
                 .lastName("Diaz")
                 .documentNumber("1061769969")
                 .phone("+573197633852")
-                .birthDate(LocalDate.of(1993, 9, 17))
+                .birthDate(LocalDate.of(1993, Month.SEPTEMBER, 17))
                 .email("armando-diaz@gmail.com")
                 .role(role)
                 .build();
