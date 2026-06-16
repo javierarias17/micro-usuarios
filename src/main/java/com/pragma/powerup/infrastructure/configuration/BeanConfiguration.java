@@ -13,6 +13,10 @@ import com.pragma.powerup.domain.usecase.AuthUseCase;
 import com.pragma.powerup.domain.usecase.CreateCustomerUseCase;
 import com.pragma.powerup.domain.usecase.CreateEmployeeUseCase;
 import com.pragma.powerup.domain.usecase.CreateOwnerUseCase;
+import com.pragma.powerup.domain.validator.UserValidator;
+import com.pragma.powerup.domain.validator.strategy.CustomerValidationStrategy;
+import com.pragma.powerup.domain.validator.strategy.EmployeeValidationStrategy;
+import com.pragma.powerup.domain.validator.strategy.OwnerValidationStrategy;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.RoleJpaAdapter;
 
 import com.pragma.powerup.domain.usecase.ValidateUserRoleUseCase;
@@ -50,17 +54,20 @@ public class BeanConfiguration {
 
     @Bean
     public ICreateOwnerServicePort createOwnerServicePort() {
-        return new CreateOwnerUseCase(userPersistencePort(), passwordEncoderPort);
+        return new CreateOwnerUseCase(userPersistencePort(), passwordEncoderPort,
+                new UserValidator(new OwnerValidationStrategy()));
     }
 
     @Bean
     public ICreateCustomerServicePort createCustomerServicePort() {
-        return new CreateCustomerUseCase(userPersistencePort(), passwordEncoderPort);
+        return new CreateCustomerUseCase(userPersistencePort(), passwordEncoderPort,
+                new UserValidator(new CustomerValidationStrategy()));
     }
 
     @Bean
     public ICreateEmployeeServicePort createEmployeeServicePort() {
-        return new CreateEmployeeUseCase(userPersistencePort(), passwordEncoderPort);
+        return new CreateEmployeeUseCase(userPersistencePort(), passwordEncoderPort,
+                new UserValidator(new EmployeeValidationStrategy()));
     }
 
     @Bean

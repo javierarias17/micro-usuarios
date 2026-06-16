@@ -18,16 +18,19 @@ public class CreateEmployeeUseCase implements ICreateEmployeeServicePort {
 
     private final IUserPersistencePort userPersistencePort;
     private final IPasswordEncoderPort passwordEncoderPort;
+    private final UserValidator userValidator;
 
     public CreateEmployeeUseCase(IUserPersistencePort userPersistencePort,
-                                 IPasswordEncoderPort passwordEncoderPort) {
+                                 IPasswordEncoderPort passwordEncoderPort,
+                                 UserValidator userValidator) {
         this.userPersistencePort = userPersistencePort;
         this.passwordEncoderPort = passwordEncoderPort;
+        this.userValidator = userValidator;
     }
 
     @Override
     public UserModel createEmployee(UserModel userModel) {
-        UserValidator.validateForEmployeeCreation(userModel);
+        userValidator.validate(userModel);
         validateBusinessRules(userModel);
         userModel.setPassword(passwordEncoderPort.encode(userModel.getPassword()));
         userModel.setRole(RoleModel.builder().id(DomainConstants.EMPLOYEE_ROLE_ID).build());

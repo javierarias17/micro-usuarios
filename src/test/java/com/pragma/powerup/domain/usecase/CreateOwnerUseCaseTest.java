@@ -1,17 +1,19 @@
 package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
+import com.pragma.powerup.domain.exception.FieldsValidationException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
 import com.pragma.powerup.domain.exception.NotAdultException;
 import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.domain.validator.UserValidator;
+import com.pragma.powerup.domain.validator.strategy.OwnerValidationStrategy;
 import com.pragma.powerup.factory.UserModelFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -32,7 +34,6 @@ class CreateOwnerUseCaseTest {
     @Mock
     private IPasswordEncoderPort passwordEncoderPort;
 
-    @InjectMocks
     private CreateOwnerUseCase createOwnerUseCase;
 
     private UserModel validUser;
@@ -42,6 +43,9 @@ class CreateOwnerUseCaseTest {
     void setUp() {
         ownerRole = UserModelFactory.createOwnerRole();
         validUser = UserModelFactory.createValidUser();
+        createOwnerUseCase = new CreateOwnerUseCase(
+                userPersistencePort, passwordEncoderPort,
+                new UserValidator(new OwnerValidationStrategy()));
     }
 
     // ─── Happy path
@@ -115,6 +119,66 @@ class CreateOwnerUseCaseTest {
     }
 
     // ─── Exceptions path
+
+    @Test
+    void Expect_FieldsValidationException_When_NameIsBlank() {
+        validUser.setName("");
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_LastNameIsNull() {
+        validUser.setLastName(null);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_DocumentNumberIsBlank() {
+        validUser.setDocumentNumber("  ");
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_DocumentNumberHasInvalidFormat() {
+        validUser.setDocumentNumber("ABC-123");
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_PhoneIsNull() {
+        validUser.setPhone(null);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_PhoneHasInvalidFormat() {
+        validUser.setPhone("not-a-phone");
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_BirthDateIsNull() {
+        validUser.setBirthDate(null);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_EmailIsBlank() {
+        validUser.setEmail("");
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_EmailHasInvalidFormat() {
+        validUser.setEmail("invalid-email");
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
+
+    @Test
+    void Expect_FieldsValidationException_When_PasswordIsNull() {
+        validUser.setPassword(null);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+    }
 
     @Test
     void Expect_MailAlreadyExistsException_When_EmailIsAlreadyRegistered() {

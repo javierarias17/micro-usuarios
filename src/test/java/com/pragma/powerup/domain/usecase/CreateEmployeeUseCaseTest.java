@@ -7,11 +7,12 @@ import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.domain.validator.UserValidator;
+import com.pragma.powerup.domain.validator.strategy.EmployeeValidationStrategy;
 import com.pragma.powerup.factory.UserModelFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,7 +30,6 @@ class CreateEmployeeUseCaseTest {
     @Mock
     private IPasswordEncoderPort passwordEncoderPort;
 
-    @InjectMocks
     private CreateEmployeeUseCase createEmployeeUseCase;
 
     private UserModel validEmployee;
@@ -39,6 +39,9 @@ class CreateEmployeeUseCaseTest {
     void setUp() {
         employeeRole = UserModelFactory.createEmployeeRole();
         validEmployee = UserModelFactory.createValidUser();
+        createEmployeeUseCase = new CreateEmployeeUseCase(
+                userPersistencePort, passwordEncoderPort,
+                new UserValidator(new EmployeeValidationStrategy()));
     }
 
     // ─── Happy path
@@ -83,7 +86,7 @@ class CreateEmployeeUseCaseTest {
         assertEquals("encodedPassword", result.getPassword());
     }
 
-    // ─── Field validation exceptions
+    // ─── Exceptions path
 
     @Test
     void Expect_FieldsValidationException_When_NameIsBlank() {
@@ -174,8 +177,6 @@ class CreateEmployeeUseCaseTest {
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
-
-    // ─── Business rule exceptions
 
     @Test
     void Expect_MailAlreadyExistsException_When_EmailIsAlreadyRegistered() {

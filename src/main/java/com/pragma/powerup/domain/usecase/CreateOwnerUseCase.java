@@ -9,6 +9,7 @@ import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.domain.validator.UserValidator;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -20,21 +21,26 @@ public class CreateOwnerUseCase implements ICreateOwnerServicePort {
 
     private final IUserPersistencePort userPersistencePort;
     private final IPasswordEncoderPort passwordEncoderPort;
+    private final UserValidator userValidator;
 
-    public CreateOwnerUseCase(IUserPersistencePort userPersistencePort, IPasswordEncoderPort passwordEncoderPort) {
+    public CreateOwnerUseCase(IUserPersistencePort userPersistencePort,
+                              IPasswordEncoderPort passwordEncoderPort,
+                              UserValidator userValidator) {
         this.userPersistencePort = userPersistencePort;
         this.passwordEncoderPort = passwordEncoderPort;
+        this.userValidator = userValidator;
     }
 
     @Override
     public UserModel createOwner(UserModel userModel) {
-        validateData(userModel);
+        userValidator.validate(userModel);
+        validateBusinessRules(userModel);
         userModel.setPassword(passwordEncoderPort.encode(userModel.getPassword()));
         userModel.setRole(RoleModel.builder().id(DomainConstants.OWNER_ROLE_ID).build());
         return userPersistencePort.saveUser(userModel);
     }
 
-    private void validateData(UserModel userModel) {
+    private void validateBusinessRules(UserModel userModel) {
         if (userPersistencePort.existsByEmail(userModel.getEmail())) {
             throw new MailAlreadyExistsException(FunctionalMessageConstants.BUSINESS_VALIDATION_FAILED,
                     Map.of(FieldConstants.EMAIL, FunctionalMessageConstants.MAIL_ALREADY_EXISTS));

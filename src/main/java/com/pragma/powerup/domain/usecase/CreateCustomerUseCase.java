@@ -18,16 +18,19 @@ public class CreateCustomerUseCase implements ICreateCustomerServicePort {
 
     private final IUserPersistencePort userPersistencePort;
     private final IPasswordEncoderPort passwordEncoderPort;
+    private final UserValidator userValidator;
 
     public CreateCustomerUseCase(IUserPersistencePort userPersistencePort,
-                                 IPasswordEncoderPort passwordEncoderPort) {
+                                 IPasswordEncoderPort passwordEncoderPort,
+                                 UserValidator userValidator) {
         this.userPersistencePort = userPersistencePort;
         this.passwordEncoderPort = passwordEncoderPort;
+        this.userValidator = userValidator;
     }
 
     @Override
     public UserModel createCustomer(UserModel userModel) {
-        UserValidator.validateForCustomerCreation(userModel);
+        userValidator.validate(userModel);
         validateBusinessRules(userModel);
         userModel.setPassword(passwordEncoderPort.encode(userModel.getPassword()));
         userModel.setRole(RoleModel.builder().id(DomainConstants.CUSTOMER_ROLE_ID).build());
