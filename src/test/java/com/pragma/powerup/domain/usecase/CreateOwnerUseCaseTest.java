@@ -28,6 +28,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CreateOwnerUseCaseTest {
 
+    private static final String BLANK_VALUE = "  ";
+    private static final String DOCUMENT_NUMBER_INVALID = "ABC-123";
+    private static final String PHONE_INVALID = "not-a-phone";
+    private static final String EMAIL_INVALID = "invalid-email";
+    private static final String RAW_PASSWORD = "secret123";
+    private static final String ENCODED_PASSWORD = "encodedPassword";
+    private static final LocalDate BIRTH_DATE_ADULT = LocalDate.of(2006, Month.JUNE, 15);
+    private static final LocalDate BIRTH_DATE_UNDERAGE = LocalDate.of(2015, Month.JUNE, 15);
+
     @Mock
     private IUserPersistencePort userPersistencePort;
 
@@ -57,7 +66,7 @@ class CreateOwnerUseCaseTest {
 
         when(userPersistencePort.existsByEmail(validUser.getEmail())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(validUser.getDocumentNumber())).thenReturn(false);
-        when(passwordEncoderPort.encode(validUser.getPassword())).thenReturn("encodedPassword");
+        when(passwordEncoderPort.encode(validUser.getPassword())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedUser);
 
         // Act
@@ -79,14 +88,14 @@ class CreateOwnerUseCaseTest {
         // Arrange
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode("secret123")).thenReturn("encodedPassword");
+        when(passwordEncoderPort.encode(RAW_PASSWORD)).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validUser);
 
         // Act
         UserModel result = createOwnerUseCase.createOwner(validUser);
 
         // Assert
-        assertEquals("encodedPassword", result.getPassword());
+        assertEquals(ENCODED_PASSWORD, result.getPassword());
     }
 
     @Test
@@ -94,7 +103,7 @@ class CreateOwnerUseCaseTest {
         // Arrange
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode(anyString())).thenReturn("encodedPassword");
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validUser);
 
         // Act
@@ -107,11 +116,11 @@ class CreateOwnerUseCaseTest {
     @Test
     void When_OwnerIsExactly18YearsOld_Expect_OwnerToBeSavedSuccessfully() {
         // Arrange
-        UserModel userExactly18 = UserModelFactory.createUserWithBirthDate(LocalDate.of(2006, Month.JUNE, 15));
+        UserModel userExactly18 = UserModelFactory.createUserWithBirthDate(BIRTH_DATE_ADULT);
 
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode(anyString())).thenReturn("encodedPassword");
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(userExactly18);
 
         // Act & Assert
@@ -122,7 +131,7 @@ class CreateOwnerUseCaseTest {
 
     @Test
     void Expect_FieldsValidationException_When_NameIsBlank() {
-        validUser.setName("");
+        validUser.setName(BLANK_VALUE);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
     }
 
@@ -134,13 +143,13 @@ class CreateOwnerUseCaseTest {
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberIsBlank() {
-        validUser.setDocumentNumber("  ");
+        validUser.setDocumentNumber(BLANK_VALUE);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
     }
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberHasInvalidFormat() {
-        validUser.setDocumentNumber("ABC-123");
+        validUser.setDocumentNumber(DOCUMENT_NUMBER_INVALID);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
     }
 
@@ -152,7 +161,7 @@ class CreateOwnerUseCaseTest {
 
     @Test
     void Expect_FieldsValidationException_When_PhoneHasInvalidFormat() {
-        validUser.setPhone("not-a-phone");
+        validUser.setPhone(PHONE_INVALID);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
     }
 
@@ -164,13 +173,13 @@ class CreateOwnerUseCaseTest {
 
     @Test
     void Expect_FieldsValidationException_When_EmailIsBlank() {
-        validUser.setEmail("");
+        validUser.setEmail(BLANK_VALUE);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailHasInvalidFormat() {
-        validUser.setEmail("invalid-email");
+        validUser.setEmail(EMAIL_INVALID);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
     }
 
@@ -204,7 +213,7 @@ class CreateOwnerUseCaseTest {
     @Test
     void Expect_NotAdultException_When_OwnerIsUnderage() {
         // Arrange
-        UserModel userUnder18 = UserModelFactory.createUserWithBirthDate(LocalDate.of(2015, Month.JUNE, 15));
+        UserModel userUnder18 = UserModelFactory.createUserWithBirthDate(BIRTH_DATE_UNDERAGE);
 
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);

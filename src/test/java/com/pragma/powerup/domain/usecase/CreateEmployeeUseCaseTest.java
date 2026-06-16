@@ -24,6 +24,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreateEmployeeUseCaseTest {
 
+    private static final String BLANK_VALUE = "  ";
+    private static final String DOCUMENT_NUMBER_INVALID = "ABC-123";
+    private static final String PHONE_INVALID = "not-a-phone";
+    private static final String EMAIL_INVALID = "invalid-email";
+    private static final String RAW_PASSWORD = "secret123";
+    private static final String ENCODED_PASSWORD = "encodedPassword";
+
     @Mock
     private IUserPersistencePort userPersistencePort;
 
@@ -53,7 +60,7 @@ class CreateEmployeeUseCaseTest {
 
         when(userPersistencePort.existsByEmail(validEmployee.getEmail())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(validEmployee.getDocumentNumber())).thenReturn(false);
-        when(passwordEncoderPort.encode(validEmployee.getPassword())).thenReturn("encodedPassword");
+        when(passwordEncoderPort.encode(validEmployee.getPassword())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedEmployee);
 
         // Act
@@ -76,125 +83,92 @@ class CreateEmployeeUseCaseTest {
         // Arrange
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode("secret123")).thenReturn("encodedPassword");
+        when(passwordEncoderPort.encode(RAW_PASSWORD)).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validEmployee);
 
         // Act
         UserModel result = createEmployeeUseCase.createEmployee(validEmployee);
 
         // Assert
-        assertEquals("encodedPassword", result.getPassword());
+        assertEquals(ENCODED_PASSWORD, result.getPassword());
     }
 
     // ─── Exceptions path
 
     @Test
     void Expect_FieldsValidationException_When_NameIsBlank() {
-        // Arrange
-        validEmployee.setName("");
-
-        // Act & Assert
+        validEmployee.setName(BLANK_VALUE);
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_FieldsValidationException_When_LastNameIsBlank() {
-        // Arrange
         validEmployee.setLastName(null);
-
-        // Act & Assert
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberIsBlank() {
-        // Arrange
-        validEmployee.setDocumentNumber("  ");
-
-        // Act & Assert
+        validEmployee.setDocumentNumber(BLANK_VALUE);
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberHasInvalidFormat() {
-        // Arrange
-        validEmployee.setDocumentNumber("ABC-123");
-
-        // Act & Assert
+        validEmployee.setDocumentNumber(DOCUMENT_NUMBER_INVALID);
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PhoneIsBlank() {
-        // Arrange
         validEmployee.setPhone(null);
-
-        // Act & Assert
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PhoneHasInvalidFormat() {
-        // Arrange
-        validEmployee.setPhone("not-a-phone");
-
-        // Act & Assert
+        validEmployee.setPhone(PHONE_INVALID);
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailIsBlank() {
-        // Arrange
-        validEmployee.setEmail("");
-
-        // Act & Assert
+        validEmployee.setEmail(BLANK_VALUE);
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailHasInvalidFormat() {
-        // Arrange
-        validEmployee.setEmail("invalid-email");
-
-        // Act & Assert
+        validEmployee.setEmail(EMAIL_INVALID);
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PasswordIsBlank() {
-        // Arrange
         validEmployee.setPassword(null);
-
-        // Act & Assert
         assertThrows(FieldsValidationException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_MailAlreadyExistsException_When_EmailIsAlreadyRegistered() {
-        // Arrange
         when(userPersistencePort.existsByEmail(validEmployee.getEmail())).thenReturn(true);
-
-        // Act & Assert
         assertThrows(MailAlreadyExistsException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }
 
     @Test
     void Expect_DocumentNumberAlreadyExistsException_When_DocumentNumberIsAlreadyRegistered() {
-        // Arrange
         when(userPersistencePort.existsByEmail(validEmployee.getEmail())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(validEmployee.getDocumentNumber())).thenReturn(true);
-
-        // Act & Assert
         assertThrows(DocumentNumberAlreadyExistsException.class,
                 () -> createEmployeeUseCase.createEmployee(validEmployee));
     }

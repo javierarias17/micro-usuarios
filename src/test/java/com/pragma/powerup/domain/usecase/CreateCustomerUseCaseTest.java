@@ -24,6 +24,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreateCustomerUseCaseTest {
 
+    private static final String BLANK_VALUE = "  ";
+    private static final String DOCUMENT_NUMBER_INVALID = "ABC-123";
+    private static final String PHONE_INVALID = "not-a-phone";
+    private static final String EMAIL_INVALID = "invalid-email";
+    private static final String RAW_PASSWORD = "secret123";
+    private static final String ENCODED_PASSWORD = "encodedPassword";
+
     @Mock
     private IUserPersistencePort userPersistencePort;
 
@@ -53,7 +60,7 @@ class CreateCustomerUseCaseTest {
 
         when(userPersistencePort.existsByEmail(validCustomer.getEmail())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(validCustomer.getDocumentNumber())).thenReturn(false);
-        when(passwordEncoderPort.encode(validCustomer.getPassword())).thenReturn("encodedPassword");
+        when(passwordEncoderPort.encode(validCustomer.getPassword())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedCustomer);
 
         // Act
@@ -75,21 +82,21 @@ class CreateCustomerUseCaseTest {
         // Arrange
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode("secret123")).thenReturn("encodedPassword");
+        when(passwordEncoderPort.encode(RAW_PASSWORD)).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validCustomer);
 
         // Act
         UserModel result = createCustomerUseCase.createCustomer(validCustomer);
 
         // Assert
-        assertEquals("encodedPassword", result.getPassword());
+        assertEquals(ENCODED_PASSWORD, result.getPassword());
     }
 
     // ─── Exceptions path
 
     @Test
     void Expect_FieldsValidationException_When_NameIsBlank() {
-        validCustomer.setName("");
+        validCustomer.setName(BLANK_VALUE);
         assertThrows(FieldsValidationException.class,
                 () -> createCustomerUseCase.createCustomer(validCustomer));
     }
@@ -103,14 +110,14 @@ class CreateCustomerUseCaseTest {
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberIsBlank() {
-        validCustomer.setDocumentNumber("  ");
+        validCustomer.setDocumentNumber(BLANK_VALUE);
         assertThrows(FieldsValidationException.class,
                 () -> createCustomerUseCase.createCustomer(validCustomer));
     }
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberHasInvalidFormat() {
-        validCustomer.setDocumentNumber("ABC-123");
+        validCustomer.setDocumentNumber(DOCUMENT_NUMBER_INVALID);
         assertThrows(FieldsValidationException.class,
                 () -> createCustomerUseCase.createCustomer(validCustomer));
     }
@@ -124,21 +131,21 @@ class CreateCustomerUseCaseTest {
 
     @Test
     void Expect_FieldsValidationException_When_PhoneHasInvalidFormat() {
-        validCustomer.setPhone("not-a-phone");
+        validCustomer.setPhone(PHONE_INVALID);
         assertThrows(FieldsValidationException.class,
                 () -> createCustomerUseCase.createCustomer(validCustomer));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailIsBlank() {
-        validCustomer.setEmail("");
+        validCustomer.setEmail(BLANK_VALUE);
         assertThrows(FieldsValidationException.class,
                 () -> createCustomerUseCase.createCustomer(validCustomer));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailHasInvalidFormat() {
-        validCustomer.setEmail("invalid-email");
+        validCustomer.setEmail(EMAIL_INVALID);
         assertThrows(FieldsValidationException.class,
                 () -> createCustomerUseCase.createCustomer(validCustomer));
     }

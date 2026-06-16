@@ -23,6 +23,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuthUseCaseTest {
 
+    private static final String EMAIL = "armando-diaz@gmail.com";
+    private static final String RAW_PASSWORD = "secret123";
+    private static final String ENCODED_PASSWORD = "encodedSecret123";
+    private static final String JWT_TOKEN = "jwt.token.signed";
+
     @Mock
     private IUserPersistencePort userPersistencePort;
 
@@ -34,11 +39,6 @@ class AuthUseCaseTest {
 
     @InjectMocks
     private AuthUseCase authUseCase;
-
-    private static final String EMAIL = "armando-diaz@gmail.com";
-    private static final String RAW_PASSWORD = "secret123";
-    private static final String ENCODED_PASSWORD = "encodedSecret123";
-    private static final String JWT_TOKEN = "jwt.token.signed";
 
     private RoleModel ownerRole;
     private UserModel savedUser;

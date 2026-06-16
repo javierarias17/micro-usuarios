@@ -19,6 +19,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ValidateUserRoleUseCaseTest {
 
+    private static final long NON_EXISTENT_USER_ID = 99L;
+
     @Mock
     private IUserPersistencePort userPersistencePort;
 
@@ -81,12 +83,11 @@ class ValidateUserRoleUseCaseTest {
     @Test
     void Expect_UserNotFoundException_When_UserDoesNotExistForIsOwner() {
         // Arrange
-        Long nonExistentUserId = 99L;
-        when(userPersistencePort.getUserById(nonExistentUserId)).thenReturn(Optional.empty());
+        when(userPersistencePort.getUserById(NON_EXISTENT_USER_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(UserNotFoundException.class,
-                () -> validateUserRoleUseCase.isOwner(nonExistentUserId));
+                () -> validateUserRoleUseCase.isOwner(NON_EXISTENT_USER_ID));
     }
 
     // ─── isEmployee: Happy path
@@ -134,11 +135,10 @@ class ValidateUserRoleUseCaseTest {
     @Test
     void Expect_UserNotFoundException_When_UserDoesNotExistForIsEmployee() {
         // Arrange
-        Long nonExistentUserId = 99L;
-        when(userPersistencePort.getUserById(nonExistentUserId)).thenReturn(Optional.empty());
+        when(userPersistencePort.getUserById(NON_EXISTENT_USER_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(UserNotFoundException.class,
-                () -> validateUserRoleUseCase.isEmployee(nonExistentUserId));
+                () -> validateUserRoleUseCase.isEmployee(NON_EXISTENT_USER_ID));
     }
 }
