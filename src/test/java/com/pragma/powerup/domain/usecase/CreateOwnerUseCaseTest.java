@@ -1,19 +1,19 @@
 package com.pragma.powerup.domain.usecase;
 
+import com.pragma.powerup.domain.common.DomainConstants;
 import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
 import com.pragma.powerup.domain.exception.FieldsValidationException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
 import com.pragma.powerup.domain.exception.NotAdultException;
-import com.pragma.powerup.domain.model.RoleModel;
+import com.pragma.powerup.domain.model.UserCreateCommand;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
-import com.pragma.powerup.domain.validator.UserValidator;
-import com.pragma.powerup.domain.validator.strategy.OwnerValidationStrategy;
 import com.pragma.powerup.factory.UserModelFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -23,17 +23,24 @@ import java.time.Month;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CreateOwnerUseCaseTest {
 
-    private static final String BLANK_VALUE = "  ";
-    private static final String DOCUMENT_NUMBER_INVALID = "ABC-123";
-    private static final String PHONE_INVALID = "not-a-phone";
-    private static final String EMAIL_INVALID = "invalid-email";
+    private static final String VALID_NAME = "Armando";
+    private static final String VALID_LAST_NAME = "Diaz";
+    private static final String VALID_DOCUMENT_NUMBER = "1061769969";
+    private static final String VALID_PHONE = "+573197633852";
+    private static final LocalDate VALID_BIRTH_DATE = LocalDate.of(1993, Month.SEPTEMBER, 17);
+    private static final String VALID_EMAIL = "armando-diaz@gmail.com";
     private static final String RAW_PASSWORD = "secret123";
     private static final String ENCODED_PASSWORD = "encodedPassword";
+
+    private static final String BLANK_VALUE = "  ";
+    private static final String INVALID_DOCUMENT_NUMBER = "ABC-123";
+    private static final String INVALID_PHONE = "not-a-phone";
+    private static final String INVALID_EMAIL = "invalid-email";
     private static final LocalDate BIRTH_DATE_ADULT = LocalDate.of(2006, Month.JUNE, 15);
     private static final LocalDate BIRTH_DATE_UNDERAGE = LocalDate.of(2015, Month.JUNE, 15);
 
@@ -44,182 +51,192 @@ class CreateOwnerUseCaseTest {
     private IPasswordEncoderPort passwordEncoderPort;
 
     private CreateOwnerUseCase createOwnerUseCase;
-
-    private UserModel validUser;
-    private RoleModel ownerRole;
+    private UserCreateCommand validCommand;
 
     @BeforeEach
     void setUp() {
-        ownerRole = UserModelFactory.createOwnerRole();
-        validUser = UserModelFactory.createValidUser();
-        createOwnerUseCase = new CreateOwnerUseCase(
-                userPersistencePort, passwordEncoderPort,
-                new UserValidator(new OwnerValidationStrategy()));
+        validCommand = UserModelFactory.createOwnerCommand();
+        createOwnerUseCase = new CreateOwnerUseCase(userPersistencePort, passwordEncoderPort);
     }
 
     // ─── Happy path
 
     @Test
     void When_OwnerInformationIsCorrect_Expect_OwnerToBeSavedSuccessfully() {
-        // Arrange
-        UserModel savedUser = UserModelFactory.createSavedUser(ownerRole);
+        UserModel savedOwner = UserModelFactory.createSavedUser(UserModelFactory.createOwnerRole());
 
-        when(userPersistencePort.existsByEmail(validUser.getEmail())).thenReturn(false);
-        when(userPersistencePort.existsByDocumentNumber(validUser.getDocumentNumber())).thenReturn(false);
-        when(passwordEncoderPort.encode(validUser.getPassword())).thenReturn(ENCODED_PASSWORD);
-        when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedUser);
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
+        when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedOwner);
 
-        // Act
-        UserModel result = createOwnerUseCase.createOwner(validUser);
+        UserModel result = createOwnerUseCase.createOwner(validCommand);
 
-        // Assert
         assertNotNull(result);
-        assertEquals(savedUser.getName(), result.getName());
-        assertEquals(savedUser.getLastName(), result.getLastName());
-        assertEquals(savedUser.getDocumentNumber(), result.getDocumentNumber());
-        assertEquals(savedUser.getPhone(), result.getPhone());
-        assertEquals(savedUser.getBirthDate(), result.getBirthDate());
-        assertEquals(savedUser.getEmail(), result.getEmail());
-        assertEquals(ownerRole, result.getRole());
+        assertEquals(savedOwner.getId(), result.getId());
+        assertEquals(savedOwner.getName(), result.getName());
+        assertEquals(savedOwner.getLastName(), result.getLastName());
+        assertEquals(savedOwner.getDocumentNumber(), result.getDocumentNumber());
+        assertEquals(savedOwner.getPhone(), result.getPhone());
+        assertEquals(savedOwner.getBirthDate(), result.getBirthDate());
+        assertEquals(savedOwner.getEmail(), result.getEmail());
     }
 
     @Test
     void When_OwnerInformationIsCorrect_Expect_PasswordToBeEncoded() {
-        // Arrange
+        ArgumentCaptor<UserModel> captor = ArgumentCaptor.forClass(UserModel.class);
+        UserModel savedOwner = UserModelFactory.createSavedUserWithPassword(
+                UserModelFactory.createOwnerRole(), ENCODED_PASSWORD);
+
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode(RAW_PASSWORD)).thenReturn(ENCODED_PASSWORD);
-        when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validUser);
+        when(userPersistencePort.saveUser(captor.capture())).thenReturn(savedOwner);
 
-        // Act
-        UserModel result = createOwnerUseCase.createOwner(validUser);
+        createOwnerUseCase.createOwner(validCommand);
 
-        // Assert
-        assertEquals(ENCODED_PASSWORD, result.getPassword());
+        assertEquals(ENCODED_PASSWORD, captor.getValue().getPassword().value());
     }
 
     @Test
     void When_OwnerInformationIsCorrect_Expect_OwnerRoleToBeAssigned() {
-        // Arrange
+        ArgumentCaptor<UserModel> captor = ArgumentCaptor.forClass(UserModel.class);
+        UserModel savedOwner = UserModelFactory.createSavedUser(UserModelFactory.createOwnerRole());
+
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
-        when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validUser);
+        when(userPersistencePort.saveUser(captor.capture())).thenReturn(savedOwner);
 
-        // Act
-        UserModel result = createOwnerUseCase.createOwner(validUser);
+        createOwnerUseCase.createOwner(validCommand);
 
-        // Assert
-        assertEquals(ownerRole.getId(), result.getRole().getId());
+        assertEquals(DomainConstants.OWNER_ROLE_ID, captor.getValue().getRole().getId());
     }
 
     @Test
     void When_OwnerIsExactly18YearsOld_Expect_OwnerToBeSavedSuccessfully() {
-        // Arrange
-        UserModel userExactly18 = UserModelFactory.createUserWithBirthDate(BIRTH_DATE_ADULT);
+        UserCreateCommand command = UserModelFactory.createOwnerCommandWithBirthDate(BIRTH_DATE_ADULT);
+        UserModel savedOwner = UserModelFactory.createSavedUser(UserModelFactory.createOwnerRole());
 
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
-        when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(userExactly18);
+        when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedOwner);
 
-        // Act & Assert
-        assertDoesNotThrow(() -> createOwnerUseCase.createOwner(userExactly18));
+        assertDoesNotThrow(() -> createOwnerUseCase.createOwner(command));
     }
 
-    // ─── Exceptions path
+    // ─── Validation exceptions
 
     @Test
     void Expect_FieldsValidationException_When_NameIsBlank() {
-        validUser.setName(BLANK_VALUE);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                BLANK_VALUE, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_LastNameIsNull() {
-        validUser.setLastName(null);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, null, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberIsBlank() {
-        validUser.setDocumentNumber(BLANK_VALUE);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, BLANK_VALUE,
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberHasInvalidFormat() {
-        validUser.setDocumentNumber(DOCUMENT_NUMBER_INVALID);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, INVALID_DOCUMENT_NUMBER,
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PhoneIsNull() {
-        validUser.setPhone(null);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                null, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PhoneHasInvalidFormat() {
-        validUser.setPhone(PHONE_INVALID);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                INVALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_BirthDateIsNull() {
-        validUser.setBirthDate(null);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailIsBlank() {
-        validUser.setEmail(BLANK_VALUE);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, VALID_BIRTH_DATE, BLANK_VALUE, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailHasInvalidFormat() {
-        validUser.setEmail(EMAIL_INVALID);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, VALID_BIRTH_DATE, INVALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PasswordIsNull() {
-        validUser.setPassword(null);
-        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(validUser));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, null);
+        assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
+
+    // ─── Business rule exceptions
 
     @Test
     void Expect_MailAlreadyExistsException_When_EmailIsAlreadyRegistered() {
-        // Arrange
-        when(userPersistencePort.existsByEmail(validUser.getEmail())).thenReturn(true);
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(true);
 
-        // Act & Assert
         assertThrows(MailAlreadyExistsException.class,
-                () -> createOwnerUseCase.createOwner(validUser));
+                () -> createOwnerUseCase.createOwner(validCommand));
     }
 
     @Test
     void Expect_DocumentNumberAlreadyExistsException_When_DocumentNumberIsAlreadyRegistered() {
-        // Arrange
-        when(userPersistencePort.existsByEmail(validUser.getEmail())).thenReturn(false);
-        when(userPersistencePort.existsByDocumentNumber(validUser.getDocumentNumber())).thenReturn(true);
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(true);
 
-        // Act & Assert
         assertThrows(DocumentNumberAlreadyExistsException.class,
-                () -> createOwnerUseCase.createOwner(validUser));
+                () -> createOwnerUseCase.createOwner(validCommand));
     }
 
     @Test
     void Expect_NotAdultException_When_OwnerIsUnderage() {
-        // Arrange
-        UserModel userUnder18 = UserModelFactory.createUserWithBirthDate(BIRTH_DATE_UNDERAGE);
+        UserCreateCommand command = UserModelFactory.createOwnerCommandWithBirthDate(BIRTH_DATE_UNDERAGE);
 
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
 
-        // Act & Assert
-        assertThrows(NotAdultException.class,
-                () -> createOwnerUseCase.createOwner(userUnder18));
+        assertThrows(NotAdultException.class, () -> createOwnerUseCase.createOwner(command));
     }
 }

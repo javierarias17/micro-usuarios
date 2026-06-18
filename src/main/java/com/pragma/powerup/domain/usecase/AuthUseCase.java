@@ -28,11 +28,11 @@ public class AuthUseCase implements IAuthServicePort {
                 .orElseThrow(() -> new InvalidCredentialsException(
                         FunctionalMessageConstants.INVALID_CREDENTIALS));
 
-        if (!passwordEncoderPort.matches(password, user.getPassword())) {
+        if (!passwordEncoderPort.matches(password, user.getPassword().value())) {
             throw new InvalidCredentialsException(
                     FunctionalMessageConstants.INVALID_CREDENTIALS);
         }
 
-        return tokenServicePort.generateToken(user.getEmail(), user.getRole().getName(), user.getRole().getId(), user.getId());
+        return tokenServicePort.generateToken(user.getEmail().value(), user.getRole().getName(), user.getRole().getId(), user.getId());
     }
 }

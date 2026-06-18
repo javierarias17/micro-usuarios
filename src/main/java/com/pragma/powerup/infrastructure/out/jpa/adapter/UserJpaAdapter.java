@@ -1,9 +1,9 @@
 package com.pragma.powerup.infrastructure.out.jpa.adapter;
 
-import com.pragma.powerup.domain.exception.TechnicalException;
-import com.pragma.powerup.domain.exception.constant.TechnicalMessageConstants;
+import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.infrastructure.out.jpa.entity.RoleEntity;
 import com.pragma.powerup.infrastructure.out.jpa.entity.UserEntity;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IRoleRepository;
@@ -22,12 +22,8 @@ public class UserJpaAdapter implements IUserPersistencePort {
     @Override
     public UserModel saveUser(UserModel userModel) {
         UserEntity userEntity = userEntityMapper.toEntity(userModel);
-        if (userModel.getRole() != null) {
-            userEntity.setRole(Optional.ofNullable(userModel.getRole().getId())
-                    .flatMap(roleRepository::findById)
-                    .orElseThrow(() -> new TechnicalException(TechnicalMessageConstants.ROLE_NOT_FOUND)));
-        }
-        return userEntityMapper.toUserModel(userRepository.save(userEntity));
+        userEntity.setRole(roleRepository.findById(userModel.getRole().getId()).orElse(null));
+        return toModel(userRepository.save(userEntity));
     }
 
     @Override
@@ -42,13 +38,30 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     @Override
     public Optional<UserModel> getUserById(Long id) {
-        return userRepository.findById(id)
-                .map(userEntityMapper::toUserModel);
+        return userRepository.findById(id).map(this::toModel);
     }
 
     @Override
     public Optional<UserModel> findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .map(userEntityMapper::toUserModel);
+        return userRepository.findByEmail(email).map(this::toModel);
+    }
+
+    private UserModel toModel(UserEntity entity) {
+        if (entity == null) return null;
+        RoleEntity roleEntity = entity.getRole();
+        RoleModel role = roleEntity != null
+                ? new RoleModel(roleEntity.getId(), roleEntity.getName(), roleEntity.getDescription())
+                : null;
+        return UserModel.reconstruct(
+                entity.getId(),
+                entity.getName(),
+                entity.getLastName(),
+                entity.getDocumentNumber(),
+                entity.getPhone(),
+                entity.getBirthDate(),
+                entity.getEmail(),
+                entity.getPassword(),
+                role
+        );
     }
 }

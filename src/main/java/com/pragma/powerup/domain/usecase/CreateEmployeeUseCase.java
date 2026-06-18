@@ -7,10 +7,10 @@ import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
 import com.pragma.powerup.domain.exception.constant.FunctionalMessageConstants;
 import com.pragma.powerup.domain.model.RoleModel;
+import com.pragma.powerup.domain.model.UserCreateCommand;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
-import com.pragma.powerup.domain.validator.UserValidator;
 
 import java.util.Map;
 
@@ -18,31 +18,36 @@ public class CreateEmployeeUseCase implements ICreateEmployeeServicePort {
 
     private final IUserPersistencePort userPersistencePort;
     private final IPasswordEncoderPort passwordEncoderPort;
-    private final UserValidator userValidator;
 
     public CreateEmployeeUseCase(IUserPersistencePort userPersistencePort,
-                                 IPasswordEncoderPort passwordEncoderPort,
-                                 UserValidator userValidator) {
+                                 IPasswordEncoderPort passwordEncoderPort) {
         this.userPersistencePort = userPersistencePort;
         this.passwordEncoderPort = passwordEncoderPort;
-        this.userValidator = userValidator;
     }
 
     @Override
-    public UserModel createEmployee(UserModel userModel) {
-        userValidator.validate(userModel);
-        validateBusinessRules(userModel);
-        userModel.setPassword(passwordEncoderPort.encode(userModel.getPassword()));
-        userModel.setRole(RoleModel.builder().id(DomainConstants.EMPLOYEE_ROLE_ID).build());
-        return userPersistencePort.saveUser(userModel);
+    public UserModel createEmployee(UserCreateCommand command) {
+        UserModel employee = UserModel.builder()
+                .name(command.name())
+                .lastName(command.lastName())
+                .documentNumber(command.documentNumber())
+                .phone(command.phone())
+                .email(command.email())
+                .password(command.password() != null ? passwordEncoderPort.encode(command.password()) : null)
+                .birthDate(command.birthDate())
+                .role(new RoleModel(DomainConstants.EMPLOYEE_ROLE_ID, null, null))
+                .build();
+
+        validateBusinessRules(employee);
+        return userPersistencePort.saveUser(employee);
     }
 
-    private void validateBusinessRules(UserModel userModel) {
-        if (userPersistencePort.existsByEmail(userModel.getEmail())) {
+    private void validateBusinessRules(UserModel employee) {
+        if (userPersistencePort.existsByEmail(employee.getEmail().value())) {
             throw new MailAlreadyExistsException(FunctionalMessageConstants.BUSINESS_VALIDATION_FAILED,
                     Map.of(FieldConstants.EMAIL, FunctionalMessageConstants.MAIL_ALREADY_EXISTS));
         }
-        if (userPersistencePort.existsByDocumentNumber(userModel.getDocumentNumber())) {
+        if (userPersistencePort.existsByDocumentNumber(employee.getDocumentNumber().value())) {
             throw new DocumentNumberAlreadyExistsException(FunctionalMessageConstants.BUSINESS_VALIDATION_FAILED,
                     Map.of(FieldConstants.DOCUMENT_NUMBER, FunctionalMessageConstants.DOCUMENT_NUMBER_ALREADY_EXISTS));
         }

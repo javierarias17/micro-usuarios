@@ -1,18 +1,18 @@
 package com.pragma.powerup.domain.usecase;
 
+import com.pragma.powerup.domain.common.DomainConstants;
 import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
 import com.pragma.powerup.domain.exception.FieldsValidationException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
-import com.pragma.powerup.domain.model.RoleModel;
+import com.pragma.powerup.domain.model.UserCreateCommand;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
-import com.pragma.powerup.domain.validator.UserValidator;
-import com.pragma.powerup.domain.validator.strategy.CustomerValidationStrategy;
 import com.pragma.powerup.factory.UserModelFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -24,12 +24,18 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreateCustomerUseCaseTest {
 
-    private static final String BLANK_VALUE = "  ";
-    private static final String DOCUMENT_NUMBER_INVALID = "ABC-123";
-    private static final String PHONE_INVALID = "not-a-phone";
-    private static final String EMAIL_INVALID = "invalid-email";
+    private static final String VALID_NAME = "Armando";
+    private static final String VALID_LAST_NAME = "Diaz";
+    private static final String VALID_DOCUMENT_NUMBER = "1061769969";
+    private static final String VALID_PHONE = "+573197633852";
+    private static final String VALID_EMAIL = "armando-diaz@gmail.com";
     private static final String RAW_PASSWORD = "secret123";
     private static final String ENCODED_PASSWORD = "encodedPassword";
+
+    private static final String BLANK_VALUE = "  ";
+    private static final String INVALID_DOCUMENT_NUMBER = "ABC-123";
+    private static final String INVALID_PHONE = "not-a-phone";
+    private static final String INVALID_EMAIL = "invalid-email";
 
     @Mock
     private IUserPersistencePort userPersistencePort;
@@ -38,137 +44,159 @@ class CreateCustomerUseCaseTest {
     private IPasswordEncoderPort passwordEncoderPort;
 
     private CreateCustomerUseCase createCustomerUseCase;
-
-    private UserModel validCustomer;
-    private RoleModel customerRole;
+    private UserCreateCommand validCommand;
 
     @BeforeEach
     void setUp() {
-        customerRole = UserModelFactory.createCustomerRole();
-        validCustomer = UserModelFactory.createValidUser();
-        createCustomerUseCase = new CreateCustomerUseCase(
-                userPersistencePort, passwordEncoderPort,
-                new UserValidator(new CustomerValidationStrategy()));
+        validCommand = UserModelFactory.createCustomerCommand();
+        createCustomerUseCase = new CreateCustomerUseCase(userPersistencePort, passwordEncoderPort);
     }
 
     // ─── Happy path
 
     @Test
     void When_CustomerInformationIsCorrect_Expect_CustomerToBeSavedSuccessfully() {
-        // Arrange
-        UserModel savedCustomer = UserModelFactory.createSavedUser(customerRole);
+        UserModel savedCustomer = UserModelFactory.createSavedUser(UserModelFactory.createCustomerRole());
 
-        when(userPersistencePort.existsByEmail(validCustomer.getEmail())).thenReturn(false);
-        when(userPersistencePort.existsByDocumentNumber(validCustomer.getDocumentNumber())).thenReturn(false);
-        when(passwordEncoderPort.encode(validCustomer.getPassword())).thenReturn(ENCODED_PASSWORD);
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
         when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(savedCustomer);
 
-        // Act
-        UserModel result = createCustomerUseCase.createCustomer(validCustomer);
+        UserModel result = createCustomerUseCase.createCustomer(validCommand);
 
-        // Assert
         assertNotNull(result);
-        assertNotNull(result.getId());
+        assertEquals(savedCustomer.getId(), result.getId());
         assertEquals(savedCustomer.getName(), result.getName());
         assertEquals(savedCustomer.getLastName(), result.getLastName());
         assertEquals(savedCustomer.getDocumentNumber(), result.getDocumentNumber());
         assertEquals(savedCustomer.getPhone(), result.getPhone());
         assertEquals(savedCustomer.getEmail(), result.getEmail());
-        assertEquals(customerRole, result.getRole());
     }
 
     @Test
     void When_CustomerInformationIsCorrect_Expect_PasswordToBeEncoded() {
-        // Arrange
+        ArgumentCaptor<UserModel> captor = ArgumentCaptor.forClass(UserModel.class);
+        UserModel savedCustomer = UserModelFactory.createSavedUserWithPassword(
+                UserModelFactory.createCustomerRole(), ENCODED_PASSWORD);
+
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
-        when(passwordEncoderPort.encode(RAW_PASSWORD)).thenReturn(ENCODED_PASSWORD);
-        when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(validCustomer);
+        when(userPersistencePort.saveUser(captor.capture())).thenReturn(savedCustomer);
 
-        // Act
-        UserModel result = createCustomerUseCase.createCustomer(validCustomer);
+        createCustomerUseCase.createCustomer(validCommand);
 
-        // Assert
-        assertEquals(ENCODED_PASSWORD, result.getPassword());
+        assertEquals(ENCODED_PASSWORD, captor.getValue().getPassword().value());
     }
 
-    // ─── Exceptions path
+    @Test
+    void When_CustomerInformationIsCorrect_Expect_CustomerRoleToBeAssigned() {
+        ArgumentCaptor<UserModel> captor = ArgumentCaptor.forClass(UserModel.class);
+        UserModel savedCustomer = UserModelFactory.createSavedUser(UserModelFactory.createCustomerRole());
+
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(false);
+        when(userPersistencePort.saveUser(captor.capture())).thenReturn(savedCustomer);
+
+        createCustomerUseCase.createCustomer(validCommand);
+
+        assertEquals(DomainConstants.CUSTOMER_ROLE_ID, captor.getValue().getRole().getId());
+    }
+
+    // ─── Validation exceptions
 
     @Test
     void Expect_FieldsValidationException_When_NameIsBlank() {
-        validCustomer.setName(BLANK_VALUE);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                BLANK_VALUE, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_LastNameIsBlank() {
-        validCustomer.setLastName(null);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, null, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberIsBlank() {
-        validCustomer.setDocumentNumber(BLANK_VALUE);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, BLANK_VALUE,
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_DocumentNumberHasInvalidFormat() {
-        validCustomer.setDocumentNumber(DOCUMENT_NUMBER_INVALID);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, INVALID_DOCUMENT_NUMBER,
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PhoneIsBlank() {
-        validCustomer.setPhone(null);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                null, null, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PhoneHasInvalidFormat() {
-        validCustomer.setPhone(PHONE_INVALID);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                INVALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailIsBlank() {
-        validCustomer.setEmail(BLANK_VALUE);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, null, BLANK_VALUE, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_EmailHasInvalidFormat() {
-        validCustomer.setEmail(EMAIL_INVALID);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, null, INVALID_EMAIL, RAW_PASSWORD);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
     @Test
     void Expect_FieldsValidationException_When_PasswordIsBlank() {
-        validCustomer.setPassword(null);
-        assertThrows(FieldsValidationException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+        UserCreateCommand cmd = new UserCreateCommand(
+                VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
+                VALID_PHONE, null, VALID_EMAIL, null);
+        assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
+
+    // ─── Business rule exceptions
 
     @Test
     void Expect_MailAlreadyExistsException_When_EmailIsAlreadyRegistered() {
-        when(userPersistencePort.existsByEmail(validCustomer.getEmail())).thenReturn(true);
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(true);
+
         assertThrows(MailAlreadyExistsException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+                () -> createCustomerUseCase.createCustomer(validCommand));
     }
 
     @Test
     void Expect_DocumentNumberAlreadyExistsException_When_DocumentNumberIsAlreadyRegistered() {
-        when(userPersistencePort.existsByEmail(validCustomer.getEmail())).thenReturn(false);
-        when(userPersistencePort.existsByDocumentNumber(validCustomer.getDocumentNumber())).thenReturn(true);
+        when(passwordEncoderPort.encode(anyString())).thenReturn(ENCODED_PASSWORD);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByDocumentNumber(anyString())).thenReturn(true);
+
         assertThrows(DocumentNumberAlreadyExistsException.class,
-                () -> createCustomerUseCase.createCustomer(validCustomer));
+                () -> createCustomerUseCase.createCustomer(validCommand));
     }
 }

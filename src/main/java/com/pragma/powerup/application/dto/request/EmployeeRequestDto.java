@@ -1,44 +1,11 @@
 package com.pragma.powerup.application.dto.request;
 
-import com.pragma.powerup.domain.common.RegexConstants;
-import com.pragma.powerup.domain.common.ValidationMessageConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-
 @Getter
 @Setter
 @Schema(description = "Request body to create an employee account")
-public class EmployeeRequestDto {
-
-    @Schema(description = "Employee's first name", example = "John")
-    @NotBlank(message = ValidationMessageConstants.MSG_NAME_REQUIRED)
-    private String name;
-
-    @Schema(description = "Employee's last name", example = "Doe")
-    @NotBlank(message = ValidationMessageConstants.MSG_LAST_NAME_REQUIRED)
-    private String lastName;
-
-    @Schema(description = "Employee's document number (digits only)", example = "123456789")
-    @NotBlank(message = ValidationMessageConstants.MSG_DOCUMENT_NUMBER_REQUIRED)
-    @Pattern(regexp = RegexConstants.DOCUMENT_NUMBER_REGEX, message = ValidationMessageConstants.MSG_DOCUMENT_NUMBER_DIGITS_ONLY)
-    private String documentNumber;
-
-    @Schema(description = "Employee's phone number (max 13 chars, optional + prefix)", example = "+573001234567")
-    @NotBlank(message = ValidationMessageConstants.MSG_PHONE_REQUIRED)
-    @Pattern(regexp = RegexConstants.PHONE_REGEX, message = ValidationMessageConstants.MSG_PHONE_FORMAT)
-    private String phone;
-
-    @Schema(description = "Employee's email address", example = "john.doe@example.com")
-    @NotBlank(message = ValidationMessageConstants.MSG_EMAIL_REQUIRED)
-    @Email(message = ValidationMessageConstants.MSG_EMAIL_FORMAT)
-    private String email;
-
-    @Schema(description = "Employee's password", example = "SecurePass123!")
-    @NotBlank(message = ValidationMessageConstants.MSG_PASSWORD_REQUIRED)
-    private String password;
+public class EmployeeRequestDto extends UserBaseRequestDto {
 }

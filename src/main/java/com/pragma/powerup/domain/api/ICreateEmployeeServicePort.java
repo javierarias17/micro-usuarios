@@ -1,7 +1,8 @@
 package com.pragma.powerup.domain.api;
 
+import com.pragma.powerup.domain.model.UserCreateCommand;
 import com.pragma.powerup.domain.model.UserModel;
 
 public interface ICreateEmployeeServicePort {
-    UserModel createEmployee(UserModel userModel);
+    UserModel createEmployee(UserCreateCommand command);
 }
