@@ -10,5 +10,5 @@ public interface IUserHandler {
     UserResponseDto createEmployee(EmployeeRequestDto employeeRequestDto);
     UserResponseDto createCustomer(CustomerRequestDto customerRequestDto);
     boolean isOwner(Long userId);
-    boolean isEmployee(Long userId);
+    Long getRestaurantIdByEmployeeId(Long employeeId);
 }

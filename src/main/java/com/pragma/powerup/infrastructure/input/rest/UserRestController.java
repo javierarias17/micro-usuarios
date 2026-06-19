@@ -49,8 +49,12 @@ public class UserRestController implements IUserRestControllerDocs {
     }
 
     @Override
-    @GetMapping("/{id}/is-employee")
-    public ResponseEntity<Boolean> isEmployee(@PathVariable Long id) {
-        return ResponseEntity.ok(userHandler.isEmployee(id));
+    @GetMapping("/employee/{employeeId}/restaurant-id")
+    public ResponseEntity<Long> getRestaurantIdByEmployeeId(@PathVariable Long employeeId) {
+        Long restaurantId = userHandler.getRestaurantIdByEmployeeId(employeeId);
+        if (restaurantId == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(restaurantId);
     }
 }

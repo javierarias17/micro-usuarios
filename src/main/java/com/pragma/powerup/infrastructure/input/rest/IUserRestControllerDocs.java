@@ -59,13 +59,12 @@ public interface IUserRestControllerDocs {
         })
         ResponseEntity<Boolean> isOwner(Long id);
 
-        @Operation(summary = "Check if user is employee", description = "Returns true if the user with the given ID has the EMPLOYEE role. Requires OWNER role.")
+        @Operation(summary = "Get restaurant ID by employee", description = "Returns the restaurant ID linked to the given employee. Used internally by micro-plazoleta. Requires EMPLOYEE role.")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Validation result returned", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "true"))),
+                        @ApiResponse(responseCode = "200", description = "Restaurant ID returned", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "1"))),
                         @ApiResponse(responseCode = "401", description = "Missing or invalid JWT token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"No authentication token provided.\"}"))),
-                        @ApiResponse(responseCode = "403", description = "Authenticated user does not have OWNER role", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Access Denied\"}"))),
-                        @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"User not found in the system\"}"))),
+                        @ApiResponse(responseCode = "404", description = "Employee is not linked to any restaurant"),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"An unexpected error occurred. Please contact the administrator.\"}")))
         })
-        ResponseEntity<Boolean> isEmployee(Long id);
+        ResponseEntity<Long> getRestaurantIdByEmployeeId(Long employeeId);
 }

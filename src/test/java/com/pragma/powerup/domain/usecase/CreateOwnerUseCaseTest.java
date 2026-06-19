@@ -132,7 +132,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_NameIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 BLANK_VALUE, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -140,7 +140,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_LastNameIsNull() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, null, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -148,7 +148,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_DocumentNumberIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, BLANK_VALUE,
-                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -156,7 +156,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_DocumentNumberHasInvalidFormat() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, INVALID_DOCUMENT_NUMBER,
-                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -164,7 +164,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_PhoneIsNull() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                null, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+                null, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -172,7 +172,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_PhoneHasInvalidFormat() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                INVALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD);
+                INVALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -180,7 +180,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_BirthDateIsNull() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -188,7 +188,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_EmailIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, VALID_BIRTH_DATE, BLANK_VALUE, RAW_PASSWORD);
+                VALID_PHONE, VALID_BIRTH_DATE, BLANK_VALUE, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -196,7 +196,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_EmailHasInvalidFormat() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, VALID_BIRTH_DATE, INVALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, VALID_BIRTH_DATE, INVALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 
@@ -204,7 +204,7 @@ class CreateOwnerUseCaseTest {
     void Expect_FieldsValidationException_When_PasswordIsNull() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, null);
+                VALID_PHONE, VALID_BIRTH_DATE, VALID_EMAIL, null, null);
         assertThrows(FieldsValidationException.class, () -> createOwnerUseCase.createOwner(cmd));
     }
 

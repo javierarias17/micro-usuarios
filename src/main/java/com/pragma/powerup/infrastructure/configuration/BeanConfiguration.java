@@ -6,6 +6,7 @@ import com.pragma.powerup.domain.api.ICreateEmployeeServicePort;
 import com.pragma.powerup.domain.api.ICreateOwnerServicePort;
 import com.pragma.powerup.domain.api.IValidateUserRoleServicePort;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
+import com.pragma.powerup.domain.spi.IPlazoletaServicePort;
 import com.pragma.powerup.domain.spi.IRolePersistencePort;
 import com.pragma.powerup.domain.spi.ITokenServicePort;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
@@ -14,6 +15,7 @@ import com.pragma.powerup.domain.usecase.CreateCustomerUseCase;
 import com.pragma.powerup.domain.usecase.CreateEmployeeUseCase;
 import com.pragma.powerup.domain.usecase.CreateOwnerUseCase;
 import com.pragma.powerup.domain.usecase.ValidateUserRoleUseCase;
+import com.pragma.powerup.infrastructure.out.http.adapter.PlazoletaServiceAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.RoleJpaAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.UserJpaAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRoleEntityMapper;
@@ -21,8 +23,11 @@ import com.pragma.powerup.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IRoleRepository;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @RequiredArgsConstructor
@@ -36,6 +41,25 @@ public class BeanConfiguration {
 
     private final IPasswordEncoderPort passwordEncoderPort;
     private final ITokenServicePort tokenServicePort;
+
+    @Value("${adapter.micro-plazoleta.url}")
+    private String microRestaurantUrl;
+
+    @Value("${adapter.micro-plazoleta.timeout}")
+    private int microRestaurantTimeout;
+
+    @Bean
+    public RestTemplate restTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(microRestaurantTimeout);
+        factory.setReadTimeout(microRestaurantTimeout);
+        return new RestTemplate(factory);
+    }
+
+    @Bean
+    public IPlazoletaServicePort plazoletaServicePort() {
+        return new PlazoletaServiceAdapter(restTemplate(), microRestaurantUrl);
+    }
 
     @Bean
     public IUserPersistencePort userPersistencePort() {
@@ -54,7 +78,7 @@ public class BeanConfiguration {
 
     @Bean
     public ICreateEmployeeServicePort createEmployeeServicePort() {
-        return new CreateEmployeeUseCase(userPersistencePort(), passwordEncoderPort);
+        return new CreateEmployeeUseCase(userPersistencePort(), passwordEncoderPort, plazoletaServicePort());
     }
 
     @Bean

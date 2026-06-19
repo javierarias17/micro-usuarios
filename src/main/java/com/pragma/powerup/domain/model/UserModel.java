@@ -18,6 +18,7 @@ public class UserModel {
     private UserEmail email;
     private UserPassword password;
     private RoleModel role;
+    private RestaurantId restaurantId;
 
     private UserModel(Builder builder) {
         this.id = builder.id;
@@ -29,6 +30,7 @@ public class UserModel {
         this.password = new UserPassword(builder.password);
         this.birthDate = builder.birthDate != null ? new UserBirthDate(builder.birthDate) : null;
         this.role = builder.role;
+        this.restaurantId = builder.restaurantId != null ? new RestaurantId(builder.restaurantId) : null;
     }
 
     private UserModel() {}
@@ -40,7 +42,8 @@ public class UserModel {
     public static UserModel reconstruct(Long id, String name, String lastName,
                                         String documentNumber, String phone,
                                         LocalDate birthDate, String email,
-                                        String password, RoleModel role) {
+                                        String password, RoleModel role,
+                                        Long restaurantId) {
         UserModel model = new UserModel();
         model.id = id;
         model.name = new UserName(name);
@@ -51,6 +54,7 @@ public class UserModel {
         model.password = new UserPassword(password);
         model.birthDate = birthDate != null ? new UserBirthDate(birthDate) : null;
         model.role = role;
+        model.restaurantId = restaurantId != null ? new RestaurantId(restaurantId) : null;
         return model;
     }
 
@@ -63,6 +67,7 @@ public class UserModel {
     public UserEmail getEmail()               { return email; }
     public UserPassword getPassword()         { return password; }
     public RoleModel getRole()                { return role; }
+    public RestaurantId getRestaurantId()      { return restaurantId; }
 
     public static class Builder {
 
@@ -75,6 +80,7 @@ public class UserModel {
         private String email;
         private String password;
         private RoleModel role;
+        private Long restaurantId;
 
         public Builder id(Long id)                       { this.id = id; return this; }
         public Builder name(String name)                 { this.name = name; return this; }
@@ -85,6 +91,7 @@ public class UserModel {
         public Builder email(String email)               { this.email = email; return this; }
         public Builder password(String password)         { this.password = password; return this; }
         public Builder role(RoleModel role)              { this.role = role; return this; }
+        public Builder restaurantId(Long restaurantId)   { this.restaurantId = restaurantId; return this; }
 
         public UserModel build() {
             Map<String, String> errors = new LinkedHashMap<>();
@@ -96,6 +103,7 @@ public class UserModel {
             UserEmail.validate(email, errors);
             UserPassword.validate(password, errors);
             UserBirthDate.validate(birthDate, role != null ? role.getId() : null, errors);
+            RestaurantId.validate(restaurantId, role != null ? role.getId() : null, errors);
 
             if (!errors.isEmpty())
                 throw new FieldsValidationException(errors);

@@ -9,5 +9,6 @@ public record UserCreateCommand(
         String phone,
         LocalDate birthDate,
         String email,
-        String password
+        String password,
+        Long restaurantId
 ) {}

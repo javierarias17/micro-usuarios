@@ -61,7 +61,8 @@ public class UserJpaAdapter implements IUserPersistencePort {
                 entity.getBirthDate(),
                 entity.getEmail(),
                 entity.getPassword(),
-                role
+                role,
+                entity.getRestaurantId()
         );
     }
 }

@@ -18,6 +18,7 @@ public interface IUserEntityMapper {
     @Mapping(source = "birthDate.value", target = "birthDate")
     @Mapping(source = "email.value", target = "email")
     @Mapping(source = "password.value", target = "password")
+    @Mapping(source = "restaurantId.value", target = "restaurantId")
     @Mapping(target = "role", ignore = true)
     UserEntity toEntity(UserModel userModel);
 }

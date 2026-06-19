@@ -6,5 +6,5 @@ public class TechnicalMessageConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String ROLE_NOT_FOUND = "Role not found in the system";
+    public static final String RESTAURANT_SERVICE_UNAVAILABLE = "Restaurant service is currently unavailable";
 }

@@ -111,7 +111,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_NameIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 BLANK_VALUE, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
@@ -119,7 +119,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_LastNameIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, null, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
@@ -127,7 +127,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_DocumentNumberIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, BLANK_VALUE,
-                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
@@ -135,7 +135,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_DocumentNumberHasInvalidFormat() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, INVALID_DOCUMENT_NUMBER,
-                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
@@ -143,7 +143,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_PhoneIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                null, null, VALID_EMAIL, RAW_PASSWORD);
+                null, null, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
@@ -151,7 +151,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_PhoneHasInvalidFormat() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                INVALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD);
+                INVALID_PHONE, null, VALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
@@ -159,7 +159,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_EmailIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, null, BLANK_VALUE, RAW_PASSWORD);
+                VALID_PHONE, null, BLANK_VALUE, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
@@ -167,7 +167,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_EmailHasInvalidFormat() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, null, INVALID_EMAIL, RAW_PASSWORD);
+                VALID_PHONE, null, INVALID_EMAIL, RAW_PASSWORD, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 
@@ -175,7 +175,7 @@ class CreateCustomerUseCaseTest {
     void Expect_FieldsValidationException_When_PasswordIsBlank() {
         UserCreateCommand cmd = new UserCreateCommand(
                 VALID_NAME, VALID_LAST_NAME, VALID_DOCUMENT_NUMBER,
-                VALID_PHONE, null, VALID_EMAIL, null);
+                VALID_PHONE, null, VALID_EMAIL, null, null);
         assertThrows(FieldsValidationException.class, () -> createCustomerUseCase.createCustomer(cmd));
     }
 

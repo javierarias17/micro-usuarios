@@ -52,4 +52,7 @@ public class UserEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
+
+    @Column(name = "restaurant_id")
+    private Long restaurantId;
 }

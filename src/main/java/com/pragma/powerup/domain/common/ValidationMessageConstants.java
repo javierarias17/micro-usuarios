@@ -27,4 +27,7 @@ public class ValidationMessageConstants {
 
     // Password
     public static final String MSG_PASSWORD_REQUIRED = "Password is required";
+
+    // Restaurant
+    public static final String MSG_RESTAURANT_ID_REQUIRED = "Restaurant ID is required";
 }

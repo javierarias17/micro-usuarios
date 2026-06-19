@@ -43,37 +43,37 @@ public class UserModelFactory {
         return createCustomerRole();
     }
 
-    // ─── Command factories (entradas a los casos de uso)
+    // ─── Command factories
 
     public static UserCreateCommand createOwnerCommand() {
         return new UserCreateCommand(
                 "Armando", "Diaz", "1061769969", "+573197633852",
                 LocalDate.of(1993, Month.SEPTEMBER, 17),
-                "armando-diaz@gmail.com", "secret123");
+                "armando-diaz@gmail.com", "secret123", null);
     }
 
     public static UserCreateCommand createOwnerCommandWithBirthDate(LocalDate birthDate) {
         return new UserCreateCommand(
                 "Armando", "Diaz", "1061769969", "+573197633852",
                 birthDate,
-                "armando-diaz@gmail.com", "secret123");
+                "armando-diaz@gmail.com", "secret123", null);
     }
 
     public static UserCreateCommand createEmployeeCommand() {
         return new UserCreateCommand(
                 "Armando", "Diaz", "1061769969", "+573197633852",
                 null,
-                "armando-diaz@gmail.com", "secret123");
+                "armando-diaz@gmail.com", "secret123", 1L);
     }
 
     public static UserCreateCommand createCustomerCommand() {
         return new UserCreateCommand(
                 "Armando", "Diaz", "1061769969", "+573197633852",
                 null,
-                "armando-diaz@gmail.com", "secret123");
+                "armando-diaz@gmail.com", "secret123", null);
     }
 
-    // ─── UserModel factories (valores de retorno de los mocks)
+    // ─── UserModel factories
 
     public static UserModel createSavedUser(RoleModel role) {
         return UserModel.builder()
@@ -100,6 +100,34 @@ public class UserModelFactory {
                 .email("armando-diaz@gmail.com")
                 .password(encodedPassword)
                 .role(role)
+                .build();
+    }
+
+    public static UserModel createSavedEmployee() {
+        return UserModel.builder()
+                .id(1L)
+                .name("Armando")
+                .lastName("Diaz")
+                .documentNumber("1061769969")
+                .phone("+573197633852")
+                .email("armando-diaz@gmail.com")
+                .password("encodedPassword")
+                .role(createEmployeeRole())
+                .restaurantId(1L)
+                .build();
+    }
+
+    public static UserModel createSavedEmployeeWithPassword(String encodedPassword) {
+        return UserModel.builder()
+                .id(1L)
+                .name("Armando")
+                .lastName("Diaz")
+                .documentNumber("1061769969")
+                .phone("+573197633852")
+                .email("armando-diaz@gmail.com")
+                .password(encodedPassword)
+                .role(createEmployeeRole())
+                .restaurantId(1L)
                 .build();
     }
 }

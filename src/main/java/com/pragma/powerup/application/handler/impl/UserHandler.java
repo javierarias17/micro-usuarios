@@ -11,6 +11,7 @@ import com.pragma.powerup.domain.api.ICreateCustomerServicePort;
 import com.pragma.powerup.domain.api.ICreateEmployeeServicePort;
 import com.pragma.powerup.domain.api.ICreateOwnerServicePort;
 import com.pragma.powerup.domain.api.IValidateUserRoleServicePort;
+import com.pragma.powerup.domain.spi.IUserPersistencePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class UserHandler implements IUserHandler {
     private final ICreateEmployeeServicePort createEmployeeServicePort;
     private final ICreateCustomerServicePort createCustomerServicePort;
     private final IValidateUserRoleServicePort validateUserRoleServicePort;
+    private final IUserPersistencePort userPersistencePort;
     private final IUserRequestMapper userRequestMapper;
     private final IUserResponseMapper userResponseMapper;
 
@@ -36,7 +38,8 @@ public class UserHandler implements IUserHandler {
     @Override
     public UserResponseDto createEmployee(EmployeeRequestDto employeeRequestDto) {
         return userResponseMapper.toResponse(
-                createEmployeeServicePort.createEmployee(userRequestMapper.toUserFromEmployee(employeeRequestDto)));
+                createEmployeeServicePort.createEmployee(
+                        userRequestMapper.toUserFromEmployee(employeeRequestDto)));
     }
 
     @Override
@@ -51,7 +54,9 @@ public class UserHandler implements IUserHandler {
     }
 
     @Override
-    public boolean isEmployee(Long userId) {
-        return validateUserRoleServicePort.isEmployee(userId);
+    public Long getRestaurantIdByEmployeeId(Long employeeId) {
+        return userPersistencePort.getUserById(employeeId)
+                .map(user -> user.getRestaurantId() != null ? user.getRestaurantId().value() : null)
+                .orElse(null);
     }
 }

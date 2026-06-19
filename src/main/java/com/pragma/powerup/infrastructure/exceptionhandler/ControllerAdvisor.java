@@ -3,6 +3,7 @@ package com.pragma.powerup.infrastructure.exceptionhandler;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.pragma.powerup.domain.exception.DocumentNumberAlreadyExistsException;
 import com.pragma.powerup.domain.exception.FieldsValidationException;
+import com.pragma.powerup.domain.exception.ForbiddenException;
 import com.pragma.powerup.domain.exception.FunctionalException;
 import com.pragma.powerup.domain.exception.InvalidCredentialsException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
@@ -175,6 +176,11 @@ public class ControllerAdvisor {
         public ResponseEntity<Map<String, Object>> handleInvalidCredentialsException(
                         InvalidCredentialsException ex) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(buildErrorResponse(ex));
+        }
+
+        @ExceptionHandler(ForbiddenException.class)
+        public ResponseEntity<Map<String, Object>> handleForbiddenException(ForbiddenException ex) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(buildErrorResponse(ex));
         }
         // endregion
 

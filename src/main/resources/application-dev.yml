@@ -14,6 +14,11 @@ spring:
     init:
       mode: always
 
+adapter:
+  micro-plazoleta:
+    url: ${PLAZOLETA_SERVICE_URL}
+    timeout: 5000
+
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
