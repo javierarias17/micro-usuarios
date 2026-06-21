@@ -9,6 +9,7 @@ import com.pragma.powerup.domain.exception.InvalidCredentialsException;
 import com.pragma.powerup.domain.exception.MailAlreadyExistsException;
 import com.pragma.powerup.domain.exception.NotAdultException;
 import com.pragma.powerup.domain.exception.TechnicalException;
+import com.pragma.powerup.domain.exception.NotFoundException;
 import com.pragma.powerup.domain.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -169,6 +170,12 @@ public class ControllerAdvisor {
         @ExceptionHandler(UserNotFoundException.class)
         public ResponseEntity<Map<String, Object>> handleUserNotFoundException(
                         UserNotFoundException ex) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildErrorResponse(ex));
+        }
+
+        @ExceptionHandler(NotFoundException.class)
+        public ResponseEntity<Map<String, Object>> handleNotFoundException(
+                        NotFoundException ex) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildErrorResponse(ex));
         }
 

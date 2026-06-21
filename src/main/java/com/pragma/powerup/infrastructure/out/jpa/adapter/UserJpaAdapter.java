@@ -46,6 +46,16 @@ public class UserJpaAdapter implements IUserPersistencePort {
         return userRepository.findByEmail(email).map(this::toModel);
     }
 
+    @Override
+    public Optional<Long> findRestaurantIdByEmployeeId(Long employeeId) {
+        return userRepository.findRestaurantIdById(employeeId);
+    }
+
+    @Override
+    public Optional<String> findPhoneByCustomerId(Long customerId) {
+        return userRepository.findPhoneById(customerId);
+    }
+
     private UserModel toModel(UserEntity entity) {
         if (entity == null) return null;
         RoleEntity roleEntity = entity.getRole();

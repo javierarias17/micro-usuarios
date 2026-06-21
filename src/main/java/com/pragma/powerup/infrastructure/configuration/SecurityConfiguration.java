@@ -29,6 +29,7 @@ public class SecurityConfiguration {
     private static final String ENDPOINT_USER_CREATE_EMPLOYEE = "/api/v1/user/employee";
     private static final String ENDPOINT_USER_IS_OWNER = "/api/v1/user/*/is-owner";
     private static final String ENDPOINT_USER_EMPLOYEE_RESTAURANT_ID = "/api/v1/user/employee/*/restaurant-id";
+    private static final String ENDPOINT_USER_PHONE = "/api/v1/user/*/phone";
 
     private static final String SWAGGER_API_DOCS_PATH = "/v3/api-docs/**";
     private static final String SWAGGER_UI_PATH = "/swagger-ui/**";
@@ -60,6 +61,7 @@ public class SecurityConfiguration {
                         .antMatchers(HttpMethod.POST, ENDPOINT_USER_CREATE_OWNER).hasRole(ROLE_ADMIN)
                         .antMatchers(HttpMethod.POST, ENDPOINT_USER_CREATE_EMPLOYEE).hasRole(ROLE_OWNER)
                         .antMatchers(HttpMethod.GET, ENDPOINT_USER_EMPLOYEE_RESTAURANT_ID).hasRole(ROLE_EMPLOYEE)
+                        .antMatchers(HttpMethod.GET, ENDPOINT_USER_PHONE).hasRole(ROLE_EMPLOYEE)
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

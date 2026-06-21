@@ -63,8 +63,19 @@ public interface IUserRestControllerDocs {
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "Restaurant ID returned", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "1"))),
                         @ApiResponse(responseCode = "401", description = "Missing or invalid JWT token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"No authentication token provided.\"}"))),
+                        @ApiResponse(responseCode = "403", description = "Authenticated user does not have EMPLOYEE role", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Access Denied\"}"))),
                         @ApiResponse(responseCode = "404", description = "Employee is not linked to any restaurant"),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"An unexpected error occurred. Please contact the administrator.\"}")))
         })
         ResponseEntity<Long> getRestaurantIdByEmployeeId(Long employeeId);
+
+        @Operation(summary = "Get phone by user ID", description = "Returns the phone number of the user with the given ID. Used internally by micro-mensajeria to notify the customer. Requires EMPLOYEE role.")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Phone number returned", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "\"+573001234567\""))),
+                        @ApiResponse(responseCode = "401", description = "Missing or invalid JWT token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"No authentication token provided.\"}"))),
+                        @ApiResponse(responseCode = "403", description = "Authenticated user does not have EMPLOYEE role", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"Access Denied\"}"))),
+                        @ApiResponse(responseCode = "404", description = "User not found"),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = @ExampleObject(value = "{\"message\":\"An unexpected error occurred. Please contact the administrator.\"}")))
+        })
+        ResponseEntity<String> getPhoneByCustomerId(Long id);
 }

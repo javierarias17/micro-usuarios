@@ -11,4 +11,5 @@ public interface IUserHandler {
     UserResponseDto createCustomer(CustomerRequestDto customerRequestDto);
     boolean isOwner(Long userId);
     Long getRestaurantIdByEmployeeId(Long employeeId);
+    String getPhoneByCustomerId(Long customerId);
 }

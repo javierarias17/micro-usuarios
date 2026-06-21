@@ -4,6 +4,7 @@ import com.pragma.powerup.domain.api.IAuthServicePort;
 import com.pragma.powerup.domain.api.ICreateCustomerServicePort;
 import com.pragma.powerup.domain.api.ICreateEmployeeServicePort;
 import com.pragma.powerup.domain.api.ICreateOwnerServicePort;
+import com.pragma.powerup.domain.api.IGetUserInfoServicePort;
 import com.pragma.powerup.domain.api.IValidateUserRoleServicePort;
 import com.pragma.powerup.domain.spi.IPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IPlazoletaServicePort;
@@ -14,6 +15,7 @@ import com.pragma.powerup.domain.usecase.AuthUseCase;
 import com.pragma.powerup.domain.usecase.CreateCustomerUseCase;
 import com.pragma.powerup.domain.usecase.CreateEmployeeUseCase;
 import com.pragma.powerup.domain.usecase.CreateOwnerUseCase;
+import com.pragma.powerup.domain.usecase.GetUserInfoUseCase;
 import com.pragma.powerup.domain.usecase.ValidateUserRoleUseCase;
 import com.pragma.powerup.infrastructure.out.http.adapter.PlazoletaServiceAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.RoleJpaAdapter;
@@ -89,6 +91,11 @@ public class BeanConfiguration {
     @Bean
     public IValidateUserRoleServicePort validateUserRoleServicePort() {
         return new ValidateUserRoleUseCase(userPersistencePort());
+    }
+
+    @Bean
+    public IGetUserInfoServicePort getUserInfoServicePort() {
+        return new GetUserInfoUseCase(userPersistencePort());
     }
 
     @Bean
